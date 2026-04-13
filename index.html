@@ -392,8 +392,8 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
       <div class="sl-num" style="color:var(--a2)" id="sv2">50</div>
       <div class="sl-unit">%</div>
       <div style="margin-top:10px">
-        <div class="sl-range"><span>40%</span><span>100%</span></div>
-        <input type="range" class="c2" id="s2" min="40" max="100" step="1" value="50" oninput="onSlider(2,this.value)">
+        <div class="sl-range"><span>0%</span><span>100%</span></div>
+        <input type="range" class="c2" id="s2" min="0" max="100" step="1" value="50" oninput="onSlider(2,this.value)">
       </div>
       <div class="sl-base">기준 <b id="sb2">50%</b></div>
     </div>
@@ -414,8 +414,8 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
       <div class="sl-num" style="color:var(--a5)" id="sv4">50</div>
       <div class="sl-unit">%</div>
       <div style="margin-top:10px">
-        <div class="sl-range"><span>20%</span><span>100%</span></div>
-        <input type="range" class="c5" id="s4" min="20" max="100" step="1" value="50" oninput="onSlider(4,this.value)">
+        <div class="sl-range"><span>0%</span><span>100%</span></div>
+        <input type="range" class="c5" id="s4" min="0" max="100" step="1" value="50" oninput="onSlider(4,this.value)">
       </div>
       <div class="sl-base">기준 <b id="sb4">50%</b></div>
     </div>
@@ -670,9 +670,9 @@ function setBaseline(){
   document.getElementById('sb4').textContent = Math.round(P.ec*100)+'%';
   document.getElementById('sb5').textContent = P.ppa+'원/kWh';
   const s1=document.getElementById('s1'); s1.value=P.gtIdx; updateTrack(s1,'c1',P.gtIdx,0,11);
-  const s2=document.getElementById('s2'); s2.value=Math.round(P.cf*100); updateTrack(s2,'c2',P.cf*100,40,100);
+  const s2=document.getElementById('s2'); s2.value=Math.round(P.cf*100); updateTrack(s2,'c2',P.cf*100,0,100);
   const s3=document.getElementById('s3'); s3.value=Math.round(P.mix*100); updateTrack(s3,'c3',P.mix*100,20,100);
-  const s4=document.getElementById('s4'); s4.value=Math.round(P.ec*100); updateTrack(s4,'c5',P.ec*100,20,100);
+  const s4=document.getElementById('s4'); s4.value=Math.round(P.ec*100); updateTrack(s4,'c5',P.ec*100,0,100);
   const s5=document.getElementById('s5'); s5.value=P.ppa; updateTrack(s5,'c6',P.ppa,50,400);
   document.getElementById('sv1').textContent=GT[P.gtIdx].cap;
   document.getElementById('gt-badge1').textContent=GT[P.gtIdx].label;
@@ -966,7 +966,7 @@ function onSlider(id,val){
   SV[id]=+val;
   document.getElementById('sv'+id).textContent=val;
   const cls=['','c1','c2','c3','c5','c6'][id];
-  const ranges=[[],[],[40,100],[20,100],[20,100],[50,400]];
+  const ranges=[[],[],[0,100],[20,100],[0,100],[50,400]];
   const r2=ranges[id]||[0,100];
   updateTrack(document.getElementById('s'+id),cls,+val,r2[0],r2[1]);
   runSens();
@@ -1038,11 +1038,11 @@ function resetSliders(){
   document.getElementById('gt-badge1').textContent=GT[bgi].label;
   updateTrack(s1,'c1',bgi,0,11);
   const s2=document.getElementById('s2'); s2.value=bcf;
-  document.getElementById('sv2').textContent=bcf; updateTrack(s2,'c2',bcf,40,100);
+  document.getElementById('sv2').textContent=bcf; updateTrack(s2,'c2',bcf,0,100);
   const s3=document.getElementById('s3'); s3.value=bmix;
   document.getElementById('sv3').textContent=bmix; updateTrack(s3,'c3',bmix,20,100);
   const s4=document.getElementById('s4'); s4.value=bec;
-  document.getElementById('sv4').textContent=bec; updateTrack(s4,'c5',bec,20,100);
+  document.getElementById('sv4').textContent=bec; updateTrack(s4,'c5',bec,0,100);
   const s5=document.getElementById('s5'); s5.value=bppa;
   document.getElementById('sv5').textContent=bppa; updateTrack(s5,'c6',bppa,50,400);
   runSens();
@@ -1108,9 +1108,9 @@ function showPage(id,btn){
 // ── INIT ─────────────────────────────────────────
 window.onload=()=>{
   updateTrack(document.getElementById('s1'),'c1',0,0,11);
-  updateTrack(document.getElementById('s2'),'c2',50,40,100);
+  updateTrack(document.getElementById('s2'),'c2',50,0,100);
   updateTrack(document.getElementById('s3'),'c3',100,20,100);
-  updateTrack(document.getElementById('s4'),'c5',50,20,100);
+  updateTrack(document.getElementById('s4'),'c5',50,0,100);
   updateTrack(document.getElementById('s5'),'c6',220,50,400);
   initAll();
 };
