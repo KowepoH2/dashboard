@@ -652,7 +652,7 @@ function recalcDash(){
 
 function setBaseFromResult(r){
   BASE = {
-    gen:r.gen, h2:r.h2, elec_mw:r.elec_mw, sol_mw:r.sol_mw, wind_mw:r.wind_mw,
+    gen:r.gen, h2_mix:r.h2_mix, h2:r.h2, elec_mw:r.elec_mw, sol_mw:r.sol_mw, wind_mw:r.wind_mw,
     cx_gen:r.cx_gen, cx_elec:r.cx_elec, cx_re_ref:r.cx_re_ref, cx_tot:r.cx_tot,
     lcoh:r.lcoh, lcoe:r.lcoe,
     gtIdx:P.gtIdx, cf:P.cf, mix:P.mix, ec:P.ec, ppa:P.ppa
@@ -689,8 +689,8 @@ function setBaseline(){
 // ── KPI 업데이트 ────────────────────────────────
 function updateKPI(r){
   const gt = GT[P.gtIdx];
-  document.getElementById('kv-gen').textContent  = r.gen.toFixed(4)+' TWh/년';
-  document.getElementById('ks-gen').textContent  = '발전설비 '+gt.cap+'MW × '+Math.round(P.cf*100)+'% 이용률';
+  document.getElementById('kv-gen').textContent  = r.h2_mix.toFixed(4)+' TWh/년';
+  document.getElementById('ks-gen').textContent  = '총발전 '+r.gen.toFixed(3)+' TWh × 혼소율 '+Math.round(P.mix*100)+'%';
   document.getElementById('kv-h2').textContent   = r.h2.toFixed(4)+' 만톤/년';
   document.getElementById('ks-h2').textContent   = '혼소율 '+Math.round(P.mix*100)+'% 적용';
   document.getElementById('kv-emw').textContent  = Math.round(r.elec_mw).toLocaleString()+' MW';
@@ -924,7 +924,7 @@ function buildWF(){
 function buildRadar(r){
   const b=BASE;
   const cur=[
-    b.gen?r.gen/b.gen*100:100, b.h2?r.h2/b.h2*100:100,
+    b.h2_mix?r.h2_mix/b.h2_mix*100:100, b.h2?r.h2/b.h2*100:100,
     b.elec_mw?r.elec_mw/b.elec_mw*100:100, b.cx_tot?r.cx_tot/b.cx_tot*100:100,
     b.lcoh?r.lcoh/b.lcoh*100:100, b.lcoe?r.lcoe/b.lcoe*100:100
   ];
@@ -999,7 +999,7 @@ function runSens(){
 function updateResCards(r){
   const re_total = r.sol_mw + r.wind_mw;
   const entries=[
-    {i:1, val:r.gen.toFixed(4)+' TWh/년',   base:BASE.gen,    cur:r.gen},
+    {i:1, val:r.h2_mix.toFixed(4)+' TWh/년', base:BASE.h2_mix, cur:r.h2_mix},
     {i:2, val:r.h2.toFixed(4)+' 만톤/년',   base:BASE.h2,     cur:r.h2},
     {i:3, val:Math.round(r.elec_mw).toLocaleString()+' MW', base:BASE.elec_mw, cur:r.elec_mw},
     {i:4, val:Math.round(r.sol_mw).toLocaleString()+'MW(태양광) / '+Math.round(r.wind_mw).toLocaleString()+'MW(풍력)', base:(BASE.sol_mw||0)+(BASE.wind_mw||0), cur:re_total},
@@ -1055,7 +1055,7 @@ function resetSliders(){
 function buildSensTable(){
   const tbl=document.getElementById('mt');
   const metrics=[
-    {k:'gen',    lbl:'수소발전량 (TWh/년)', fmt:v=>v.toFixed(4)},
+    {k:'h2_mix', lbl:'수소발전량 (TWh/년)', fmt:v=>v.toFixed(4)},
     {k:'h2',     lbl:'수소소모량 (만톤/년)',fmt:v=>v.toFixed(4)},
     {k:'elec_mw',lbl:'수전해 용량 (MW)',   fmt:v=>Math.round(v).toLocaleString()},
     {k:'cx_gen', lbl:'발전 CAPEX (억원)',  fmt:v=>Math.round(v).toLocaleString()},
