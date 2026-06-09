@@ -91,13 +91,14 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',Arial,sans-seri
 .mode-label{font-size:11px;color:var(--sub);}
 
 /* SLIDERS */
-.sl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
+.sl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:22px;}
 .sl-card{background:var(--panel);border-radius:12px;border:2px solid var(--bdr);padding:18px 18px 14px;transition:border-color .2s,box-shadow .2s;}
 .sl-card.a1{border-color:var(--a1);box-shadow:0 0 16px rgba(0,194,255,.12);}
 .sl-card.a2{border-color:var(--a2);box-shadow:0 0 16px rgba(0,229,160,.12);}
 .sl-card.a3{border-color:var(--a3);box-shadow:0 0 16px rgba(255,159,67,.12);}
 .sl-card.a5{border-color:var(--a5);box-shadow:0 0 16px rgba(162,155,254,.12);}
 .sl-card.a6{border-color:var(--a6);box-shadow:0 0 16px rgba(253,121,168,.12);}
+.sl-card.a4{border-color:var(--a4);box-shadow:0 0 16px rgba(255,107,107,.12);}
 .sl-vname{font-size:11px;color:var(--sub);margin-bottom:3px;}
 .sl-num{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1;}
 .sl-unit{font-size:11px;color:var(--sub);margin-bottom:12px;}
@@ -122,6 +123,9 @@ input[type=range].c5::-webkit-slider-runnable-track{height:4px;border-radius:2px
 input[type=range].c6{background:linear-gradient(to right,var(--a6) var(--p,50%),var(--panel2) var(--p,50%));}
 input[type=range].c6::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--a6);cursor:grab;box-shadow:0 0 8px rgba(253,121,168,.5);margin-top:-8px;display:block;}
 input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
+input[type=range].c4{background:linear-gradient(to right,var(--a4) var(--p,50%),var(--panel2) var(--p,50%));}
+input[type=range].c4::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--a4);cursor:grab;box-shadow:0 0 8px rgba(255,107,107,.5);margin-top:-8px;display:block;}
+input[type=range].c4::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
 
 /* RESET BTN */
 .reset-btn{display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;background:var(--panel2);color:var(--sub);font-size:12px;font-weight:600;transition:all .2s;}
@@ -163,6 +167,7 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
   .inp-grid{grid-template-columns:repeat(2,1fr);}
   .sl-grid{grid-template-columns:repeat(3,1fr);}
   .res-grid{grid-template-columns:repeat(2,1fr);}
+  .res-grid.rg6{grid-template-columns:repeat(2,1fr);}
   .sc-grid{grid-template-columns:1fr;}
 }
 @media(max-width:768px){
@@ -479,6 +484,17 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
       </div>
       <div class="sl-base">기준 <b id="sb5">185원/kWh</b></div>
     </div>
+    <!-- S6: 환율 -->
+    <div class="sl-card a4">
+      <div class="sl-vname">환율 (원/$)</div>
+      <div class="sl-num" style="color:var(--a4)" id="sv6">1,450</div>
+      <div class="sl-unit">원/$</div>
+      <div style="margin-top:10px">
+        <div class="sl-range"><span>1,000원</span><span>2,000원</span></div>
+        <input type="range" class="c4" id="s6" min="1000" max="2000" step="50" value="1450" oninput="onSlider(6,this.value)">
+      </div>
+      <div class="sl-base">기준 <b id="sb6">1,450원/$</b></div>
+    </div>
   </div>
 
   <!-- RESULT CARDS -->
@@ -494,6 +510,7 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
     <div class="res-card" id="rc8"><div class="res-lbl">총 CAPEX</div><div class="res-val" id="rv8">—</div><div class="res-chg eq" id="rch8">—</div></div>
     <div class="res-card" id="rc9"><div class="res-lbl">LCOH (원/kg)</div><div class="res-val" id="rv9">—</div><div class="res-chg eq" id="rch9">—</div></div>
     <div class="res-card" id="rc10"><div class="res-lbl">LCOE (원/kWh)</div><div class="res-val" id="rv10">—</div><div class="res-chg eq" id="rch10">—</div></div>
+    <div class="res-card" id="rc11"><div class="res-lbl">LCOH ($/kg)</div><div class="res-val" id="rv11">—</div><div class="res-chg eq" id="rch11">환율 반영</div></div>
   </div>
 
   <!-- SENS CHARTS -->
@@ -574,7 +591,7 @@ let P = {
 };
 let BASE = {};
 // SV: {1: gtIdx or fcCap, 2: cf%, 3: mix%, 4: ec%, 5: ppa}
-let SV = {1:6, 2:50, 3:100, 4:50, 5:185};
+let SV = {1:6, 2:50, 3:100, 4:50, 5:185, 6:1450};
 
 // ── calcAll ───────────────────────────────────
 // type: 'gt'|'fc', fcCap: MW (FC 모드일 때 사용)
@@ -755,7 +772,8 @@ function setBaseline() {
         2: Math.round(P.cf*100),
         3: Math.round(P.mix*100),
         4: Math.round(P.ec*100),
-        5: P.ppa};
+        5: P.ppa,
+        6: P.fx};
 
   // 슬라이더 UI 업데이트
   const s1 = document.getElementById('s1');
@@ -791,6 +809,11 @@ function setBaseline() {
   document.getElementById('sb5').textContent = P.ppa+'원/kWh';
   document.getElementById('sv5').textContent = P.ppa;
   updateTrack(s5,'c6',P.ppa,50,400);
+
+  const s6=document.getElementById('s6'); s6.value=P.fx;
+  document.getElementById('sb6').textContent = P.fx.toLocaleString()+'원/$';
+  document.getElementById('sv6').textContent = P.fx.toLocaleString();
+  updateTrack(s6,'c4',P.fx,1000,2000);
 
   runSens();
   const btn = document.querySelector('.link-btn');
@@ -995,13 +1018,14 @@ function lcBase(gtIdx_or_fc, cf, mix, ec, ppa) {
 }
 
 // 현재 민감도 모드로 계산
-function lcSens(arg1, cf, mix, ec, ppa) {
+function lcSens(arg1, cf, mix, ec, ppa, fx_v) {
+  fx_v = fx_v !== undefined ? fx_v : P.fx;
   if (SENS_MODE === 'fc') {
     return calcAll(0, cf, mix, ec, ppa, P.ppar, P.ops, P.wacc, P.infl,
-                   P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'fc', arg1).lcoe;
+                   P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, fx_v, 'fc', arg1).lcoe;
   } else {
     return calcAll(arg1, cf, mix, ec, ppa, P.ppar, P.ops, P.wacc, P.infl,
-                   P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'gt').lcoe;
+                   P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, fx_v, 'gt').lcoe;
   }
 }
 
@@ -1017,16 +1041,20 @@ function buildWF() {
   const bec  = b.ec  || 0.5;
   const bppa = b.ppa || 185;
 
+  const fx_v = SV[6] !== undefined ? SV[6] : P.fx;
+  const bfx  = BASE.fx || P.fx;
+
   // 기준 LCOE는 BASE P 파라미터로 계산
   const l0 = lcBase(bgi, bcf, bmix, bec, bppa);
   // 각 변수를 순차 변경 — 현재 P 파라미터 사용
-  const l1 = lcSens(gi,  bcf, bmix, bec, bppa);
-  const l2 = lcSens(gi,  cf,  bmix, bec, bppa);
-  const l3 = lcSens(gi,  cf,  mix,  bec, bppa);
-  const l4 = lcSens(gi,  cf,  mix,  ec,  bppa);
-  const l5 = lcSens(gi,  cf,  mix,  ec,  ppa_v);
+  const l1 = lcSens(gi,  bcf, bmix, bec, bppa, bfx);
+  const l2 = lcSens(gi,  cf,  bmix, bec, bppa, bfx);
+  const l3 = lcSens(gi,  cf,  mix,  bec, bppa, bfx);
+  const l4 = lcSens(gi,  cf,  mix,  ec,  bppa, bfx);
+  const l5 = lcSens(gi,  cf,  mix,  ec,  ppa_v, bfx);
+  const l6 = lcSens(gi,  cf,  mix,  ec,  ppa_v, fx_v);
 
-  const d = [l1-l0, l2-l1, l3-l2, l4-l3, l5-l4];
+  const d = [l1-l0, l2-l1, l3-l2, l4-l3, l5-l4, l6-l5];
   const fd = [
     [0,l0],
     d[0]>=0?[l0,l1]:[l1,l0],
@@ -1034,14 +1062,15 @@ function buildWF() {
     d[2]>=0?[l2,l3]:[l3,l2],
     d[3]>=0?[l3,l4]:[l4,l3],
     d[4]>=0?[l4,l5]:[l5,l4],
-    [0,l5]
+    d[5]>=0?[l5,l6]:[l6,l5],
+    [0,l6]
   ];
   function clrFor(dv){
     if(Math.abs(dv)<0.5) return 'rgba(176,196,222,.5)';
     return dv>0?'rgba(255,107,107,.85)':'rgba(0,229,160,.85)';
   }
-  const finClr = l5<l0?'rgba(0,229,160,.85)':l5>l0?'rgba(255,107,107,.85)':'rgba(0,194,255,.85)';
-  const colors = ['rgba(162,155,254,.85)',clrFor(d[0]),clrFor(d[1]),clrFor(d[2]),clrFor(d[3]),clrFor(d[4]),finClr];
+  const finClr = l6<l0?'rgba(0,229,160,.85)':l6>l0?'rgba(255,107,107,.85)':'rgba(0,194,255,.85)';
+  const colors = ['rgba(162,155,254,.85)',clrFor(d[0]),clrFor(d[1]),clrFor(d[2]),clrFor(d[3]),clrFor(d[4]),clrFor(d[5]),finClr];
 
   // S1 레이블: GT 모드 vs FC 모드
   let s1lbl;
@@ -1051,7 +1080,8 @@ function buildWF() {
     s1lbl = `GT조합\n(${GT[gi]?GT[gi].label:'—'})`;
   }
   const labels = ['기준 LCOE', s1lbl, `발전이용률\n(${SV[2]}%)`, `혼소율\n(${SV[3]}%)`,
-                  `수전해이용률\n(${SV[4]}%)`, `PPA단가\n(${ppa_v}원)`, '최종 LCOE'];
+                  `수전해이용률\n(${SV[4]}%)`, `PPA단가\n(${ppa_v}원)`,
+                  `환율\n(${fx_v.toLocaleString()}원/$)`, '최종 LCOE'];
 
   return {labels, datasets:[{
     label:'LCOE', data:fd,
@@ -1132,10 +1162,11 @@ function onS1(idx) {
 function onSlider(id, val) {
   SV[id] = +val;
   document.getElementById('sv'+id).textContent = val;
-  const cls   = ['','c1','c2','c3','c5','c6'][id];
-  const ranges = [[],[],[0,100],[20,100],[0,100],[50,400]];
+  const cls   = ['','c1','c2','c3','c5','c6','c4'][id];
+  const ranges = [[],[],[0,100],[20,100],[0,100],[50,400],[1000,2000]];
   const r2 = ranges[id] || [0,100];
   updateTrack(document.getElementById('s'+id), cls, +val, r2[0], r2[1]);
+  if (id === 6) document.getElementById('sv6').textContent = (+val).toLocaleString();
   runSens();
 }
 
@@ -1188,14 +1219,15 @@ function setSensMode(mode) {
 function runSens() {
   const gi    = SV[1];
   const cf    = SV[2]/100, mix=SV[3]/100, ec=SV[4]/100, ppa_v=SV[5];
+  const fx_sv = SV[6] !== undefined ? SV[6] : P.fx;
 
   let r;
   if (SENS_MODE === 'fc') {
     r = calcAll(0, cf, mix, ec, ppa_v, P.ppar, P.ops, P.wacc, P.infl,
-                P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'fc', gi);
+                P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, fx_sv, 'fc', gi);
   } else {
     r = calcAll(gi, cf, mix, ec, ppa_v, P.ppar, P.ops, P.wacc, P.infl,
-                P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'gt');
+                P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, fx_sv, 'gt');
   }
 
   updateResCards(r);
@@ -1238,6 +1270,7 @@ function updateResCards(r) {
     {i:8,  val:Math.round(r.cx_tot).toLocaleString()+' 억원',      base:BASE.cx_tot,  cur:r.cx_tot},
     {i:9,  val:Math.round(r.lcoh).toLocaleString()+' 원/kg',       base:BASE.lcoh,    cur:r.lcoh},
     {i:10, val:Math.round(r.lcoe).toLocaleString()+' 원/kWh',      base:BASE.lcoe,    cur:r.lcoe},
+    {i:11, val:'$ '+(r.lcoh/fx_sv).toFixed(2)+' /kg',              base:BASE.lcoh&&BASE.fx?BASE.lcoh/BASE.fx:null, cur:r.lcoh/fx_sv},
   ];
   entries.forEach(e => {
     document.getElementById('rv'+e.i).textContent = e.val;
@@ -1264,15 +1297,16 @@ function resetSliders() {
   const bec   = Math.round((BASE.ec  || P.ec)*100);
   const bppa  = BASE.ppa || P.ppa;
 
+  const bfx = BASE.fx || P.fx;
   if (SENS_MODE === 'fc') {
-    SV = {1:bFcCap, 2:bcf, 3:bmix, 4:bec, 5:bppa};
+    SV = {1:bFcCap, 2:bcf, 3:bmix, 4:bec, 5:bppa, 6:bfx};
     const s1 = document.getElementById('s1');
     s1.value = bFcCap;
     document.getElementById('sv1').textContent = bFcCap;
     document.getElementById('gt-badge1').textContent = 'PAFC · '+bFcCap+' MW';
     updateTrack(s1,'c1',bFcCap,0,50);
   } else {
-    SV = {1:bIdx, 2:bcf, 3:bmix, 4:bec, 5:bppa};
+    SV = {1:bIdx, 2:bcf, 3:bmix, 4:bec, 5:bppa, 6:bfx};
     const s1 = document.getElementById('s1');
     s1.value = bIdx;
     document.getElementById('sv1').textContent = GT[bIdx]?GT[bIdx].cap:'—';
@@ -1288,6 +1322,9 @@ function resetSliders() {
   document.getElementById('sv4').textContent=bec; updateTrack(s4,'c5',bec,0,100);
   const s5=document.getElementById('s5'); s5.value=bppa;
   document.getElementById('sv5').textContent=bppa; updateTrack(s5,'c6',bppa,50,400);
+
+  const s6r=document.getElementById('s6'); s6r.value=bfx;
+  document.getElementById('sv6').textContent=bfx.toLocaleString(); updateTrack(s6r,'c4',bfx,1000,2000);
 
   runSens();
   const btn = document.getElementById('rst-btn');
@@ -1321,6 +1358,9 @@ function buildSensTable() {
       {lbl:'수전해 이용률 (%)',accent:'#ff9f43',
         vals:[20,30,40,50,60,70,80,90,100],labels:['20%','30%','40%','50%','60%','70%','80%','90%','100%'],baseIdx:3,
         calc:v=>calcAll(0,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'fc',SV[1]||10)},
+      {lbl:'환율 (원/$)',accent:'#ff6b6b',
+        vals:[1000,1100,1200,1300,1400,1450,1500,1600,1700,1800,2000],labels:['1,000','1,100','1,200','1,300','1,400','1,450','1,500','1,600','1,700','1,800','2,000'],baseIdx:5,
+        calc:v=>calcAll(0,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,v,'fc',SV[1]||10)},
     ];
   } else {
     groups = [
@@ -1333,66 +1373,4 @@ function buildSensTable() {
       {lbl:'수전해 이용률 (%)',accent:'#ff9f43',
         vals:[20,30,40,50,60,70,80,90,100],labels:['20%','30%','40%','50%','60%','70%','80%','90%','100%'],baseIdx:3,
         calc:v=>calcAll(P.gtIdx,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'gt')},
-    ];
-  }
-
-  let html = '';
-  groups.forEach((g,gi) => {
-    const results = g.vals.map(v => g.calc(v));
-    const baseR   = results[g.baseIdx];
-    html += `<thead><tr><th class="vc" style="color:${g.accent}">▌ ${g.lbl}</th>${g.labels.map((l,i)=>`<th style="${i===g.baseIdx?`color:${g.accent}`:''}">${l}</th>`).join('')}</tr></thead><tbody>`;
-    metrics.forEach(m => {
-      html += `<tr><td class="vn">${m.lbl}</td>${results.map((r,i)=>{
-        const v=r[m.k]; const base=baseR[m.k];
-        const p=base?((v-base)/base*100):0;
-        const isB=(i===g.baseIdx);
-        const clr=p>0.5?'#ff6b6b':p<-0.5?'#00e5a0':'#b0c4de';
-        return `<td style="${isB?`font-weight:700;color:${g.accent};background:rgba(0,0,0,.2)`:''}" title="Δ ${p>=0?'+':''}${p.toFixed(1)}%">
-          ${m.fmt(v)}<br><small style="color:${isB?g.accent:clr};font-size:9px">${isB?'기준':(p>=0?'▲+':'▼')+Math.abs(p).toFixed(1)+'%'}</small></td>`;
-      }).join('')}</tr>`;
-    });
-    html += '</tbody>';
-    if (gi < groups.length-1) html += `<thead><tr><td colspan="${g.vals.length+1}" style="height:12px;background:transparent;border:none"></td></tr></thead>`;
-  });
-  tbl.innerHTML = html;
-}
-
-// ── 페이지 전환 ─────────────────────────────────
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  btn.classList.add('active');
-  if (id === 'sens') {
-    buildSensTable();
-    runSens();  // ← 버그 수정: 대시보드 변경사항 즉시 반영
-  }
-}
-
-// ── 초기화 ────────────────────────────────────
-function initAll() {
-  updateP();
-  updateAutoFields();
-  const r = calcFull();
-  setBaseFromResult(r);
-  updateKPI(r);
-  initChartsDash(r);
-  buildTrendTable(r);
-  SV = {1:P.gtIdx, 2:Math.round(P.cf*100), 3:Math.round(P.mix*100), 4:Math.round(P.ec*100), 5:P.ppa};
-  initChartsSens(r);
-  runSens();
-}
-
-// ── INIT ─────────────────────────────────────────
-window.onload = () => {
-  // 초기 슬라이더 트랙 설정
-  updateTrack(document.getElementById('s1'), 'c1', 6,   0,   GT.length-1);
-  updateTrack(document.getElementById('s2'), 'c2', 50,  0,   100);
-  updateTrack(document.getElementById('s3'), 'c3', 100, 20,  100);
-  updateTrack(document.getElementById('s4'), 'c5', 50,  0,   100);
-  updateTrack(document.getElementById('s5'), 'c6', 185, 50,  400);
-  initAll();
-};
-</script>
-</body>
-</html>
+      {lbl:'환율 (원/$)',accent:'#
