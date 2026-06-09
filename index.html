@@ -61,6 +61,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',Arial,sans-seri
 .inp-unit{font-size:10px;color:var(--sub);width:46px;}
 .inp-auto{width:90px;padding:5px 8px;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.3);border-radius:6px;color:var(--a2);font-size:11px;font-weight:700;text-align:center;}
 
+/* FC badge */
+.fc-badge{display:inline-block;background:rgba(0,229,160,.15);border:1px solid var(--a2);border-radius:6px;padding:3px 10px;font-size:10px;color:var(--a2);font-weight:700;margin-top:4px;}
+
 /* CARDS */
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
 .card{background:var(--panel);border:1px solid var(--bdr);border-radius:12px;padding:18px 20px;}
@@ -79,6 +82,14 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',Arial,sans-seri
 .sens-hero h2{font-size:14px;font-weight:700;margin-bottom:4px;}
 .sens-hero p{font-size:12px;color:var(--sub);}
 
+/* MODE TOGGLE */
+.mode-wrap{display:flex;gap:8px;margin-bottom:16px;align-items:center;}
+.mode-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--bdr);cursor:pointer;background:var(--panel);color:var(--sub);font-size:11px;font-weight:600;transition:all .2s;}
+.mode-btn:hover{border-color:var(--a1);color:var(--tx);}
+.mode-btn.active-gt{background:rgba(0,194,255,.15);border-color:var(--a1);color:var(--a1);}
+.mode-btn.active-fc{background:rgba(0,229,160,.15);border-color:var(--a2);color:var(--a2);}
+.mode-label{font-size:11px;color:var(--sub);}
+
 /* SLIDERS */
 .sl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
 .sl-card{background:var(--panel);border-radius:12px;border:2px solid var(--bdr);padding:18px 18px 14px;transition:border-color .2s,box-shadow .2s;}
@@ -94,7 +105,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',Arial,sans-seri
 .sl-base{font-size:10px;color:var(--sub);text-align:center;margin-top:6px;}
 .sl-base b{display:inline-block;background:var(--panel2);border-radius:4px;padding:1px 6px;font-size:9px;}
 
-/* Custom range input - centered thumb */
+/* Custom range input */
 input[type=range]{width:100%;height:4px;cursor:pointer;-webkit-appearance:none;appearance:none;border-radius:2px;outline:none;display:block;margin:4px 0;}
 input[type=range].c1{background:linear-gradient(to right,var(--a1) var(--p,50%),var(--panel2) var(--p,50%));}
 input[type=range].c1::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--a1);cursor:grab;box-shadow:0 0 8px rgba(0,194,255,.5);margin-top:-8px;display:block;}
@@ -237,34 +248,63 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
         </div>
         <div class="inp-row">
           <span class="inp-lbl">환율</span>
-          <input class="inp-field" type="number" id="in-fx" value="1200" min="1000" max="2000" step="50" onchange="recalcDash()">
+          <input class="inp-field" type="number" id="in-fx" value="1450" min="1000" max="2000" step="50" onchange="recalcDash()">
           <span class="inp-unit">원/$</span>
         </div>
       </div>
+
       <!-- ② 발전설비 -->
       <div class="inp-group">
-        <div class="inp-gtitle">② 발전설비 (GT 모델)</div>
+        <div class="inp-gtitle">② 발전설비</div>
+        <!-- 발전기 구분 -->
         <div class="inp-row">
-          <span class="inp-lbl">GT 모델 선택</span>
-          <select class="inp-select" id="in-gt" onchange="onGTChange()">
-            <option value="0">7E.03 1x1 (140MW)</option>
-            <option value="1">7E.03 2x1 (280MW)</option>
-            <option value="2">7F.04 1x1 (300MW)</option>
-            <option value="3">7F.05 1x1 (358MW)</option>
-            <option value="4">7HA.01 1x1 (438MW)</option>
-            <option value="5">7HA.02 1x1 (573MW)</option>
-            <option value="6">7F.04 2x1 (600MW)</option>
-            <option value="7">7HA.03 1x1 (640MW)</option>
-            <option value="8">7F.05 2x1 (716MW)</option>
-            <option value="9">7HA.01 2x1 (876MW)</option>
-            <option value="10">7HA.02 2x1 (1,146MW)</option>
-            <option value="11">7HA.03 2x1 (1,280MW)</option>
+          <span class="inp-lbl">발전기 구분</span>
+          <select class="inp-select" id="in-gentype" onchange="onGenTypeChange()">
+            <option value="gt">복합발전</option>
+            <option value="fc">연료전지</option>
           </select>
           <span class="inp-unit"></span>
         </div>
+        <!-- GT 모드 행들 -->
+        <div id="rows-gt">
+          <div class="inp-row">
+            <span class="inp-lbl">GT 모델 선택</span>
+            <select class="inp-select" id="in-gt" onchange="onGTChange()">
+              <option value="0">SGT-800 1x1 (60MW)</option>
+              <option value="1">7E.02 1x1 (120MW)</option>
+              <option value="2">SGT-800 2x1 (120MW)</option>
+              <option value="3">7E.03 1x1 (140MW)</option>
+              <option value="4">7E.02 2x1 (240MW)</option>
+              <option value="5">7E.03 2x1 (283MW)</option>
+              <option value="6" selected>7F.04 1x1 (309MW)</option>
+              <option value="7">7F.05 1x1 (379MW)</option>
+              <option value="8">7HA.01 1x1 (438MW)</option>
+              <option value="9">7HA.02 1x1 (573MW)</option>
+              <option value="10">7F.04 2x1 (622MW)</option>
+              <option value="11">7HA.03 1x1 (640MW)</option>
+              <option value="12">7F.05 2x1 (762MW)</option>
+              <option value="13">7HA.01 2x1 (880MW)</option>
+              <option value="14">7HA.02 2x1 (1148MW)</option>
+              <option value="15">7HA.03 2x1 (1282MW)</option>
+            </select>
+            <span class="inp-unit"></span>
+          </div>
+        </div>
+        <!-- FC 모드 행들 -->
+        <div id="rows-fc" style="display:none">
+          <div class="inp-row">
+            <span class="inp-lbl">연료전지 용량</span>
+            <input class="inp-field" type="number" id="in-fccap" value="10" min="0" max="50" step="1" onchange="recalcDash()">
+            <span class="inp-unit">MW</span>
+          </div>
+          <div style="padding:2px 0 6px 0">
+            <span class="fc-badge">PAFC · η 49.74% · 50억/MW · O&amp;M 5%</span>
+          </div>
+        </div>
+        <!-- 공통 행들 -->
         <div class="inp-row">
           <span class="inp-lbl">발전 이용률</span>
-          <input class="inp-field" type="number" id="in-cf" value="50" min="40" max="100" onchange="recalcDash()">
+          <input class="inp-field" type="number" id="in-cf" value="50" min="0" max="100" onchange="recalcDash()">
           <span class="inp-unit">%</span>
         </div>
         <div class="inp-row">
@@ -273,11 +313,12 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
           <span class="inp-unit">%</span>
         </div>
         <div class="inp-row">
-          <span class="inp-lbl">CC 효율 (HHV) ▷</span>
-          <div class="inp-auto" id="disp-eff">43.70%</div>
+          <span class="inp-lbl" id="lbl-eff">CC 효율 (HHV) ▷</span>
+          <div class="inp-auto" id="disp-eff">—</div>
           <span class="inp-unit">자동</span>
         </div>
       </div>
+
       <!-- ③ 수전해 & 재생E -->
       <div class="inp-group">
         <div class="inp-gtitle">③ 수전해 &amp; 재생E</div>
@@ -288,7 +329,7 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
         </div>
         <div class="inp-row">
           <span class="inp-lbl">PPA 단가</span>
-          <input class="inp-field" type="number" id="in-ppa" value="220" min="50" max="400" step="10" onchange="recalcDash()">
+          <input class="inp-field" type="number" id="in-ppa" value="185" min="50" max="400" step="5" onchange="recalcDash()">
           <span class="inp-unit">원/kWh</span>
         </div>
         <div class="inp-row">
@@ -302,27 +343,28 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
           <span class="inp-unit">%</span>
         </div>
       </div>
+
       <!-- ④ CAPEX 단가 -->
       <div class="inp-group">
         <div class="inp-gtitle">④ CAPEX 단가</div>
         <div class="inp-row">
-          <span class="inp-lbl">발전단가 (스케일) ▷</span>
-          <div class="inp-auto" id="disp-pgn">26.14</div>
+          <span class="inp-lbl">발전단가 (자동) ▷</span>
+          <div class="inp-auto" id="disp-pgn">—</div>
           <span class="inp-unit">억/MW</span>
         </div>
         <div class="inp-row">
           <span class="inp-lbl">수전해 단가</span>
-          <input class="inp-field" type="number" id="in-pel" value="22.68" min="10" max="50" step="0.1" onchange="recalcDash()">
+          <input class="inp-field" type="number" id="in-pel" value="27.405" min="10" max="50" step="0.1" onchange="recalcDash()">
           <span class="inp-unit">억/MW</span>
         </div>
         <div class="inp-row">
           <span class="inp-lbl">태양광 단가(참고)</span>
-          <input class="inp-field" type="number" id="in-psol" value="13" min="5" max="30" step="0.5" onchange="recalcDash()">
+          <input class="inp-field" type="number" id="in-psol" value="15" min="5" max="30" step="0.5" onchange="recalcDash()">
           <span class="inp-unit">억/MW</span>
         </div>
         <div class="inp-row">
-          <span class="inp-lbl">풍력 단가(참고)</span>
-          <input class="inp-field" type="number" id="in-pwind" value="28" min="10" max="60" step="0.5" onchange="recalcDash()">
+          <span class="inp-lbl">해상풍력 단가(참고)</span>
+          <input class="inp-field" type="number" id="in-pwind" value="60" min="10" max="100" step="1" onchange="recalcDash()">
           <span class="inp-unit">억/MW</span>
         </div>
         <div class="inp-row">
@@ -332,7 +374,7 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
         </div>
         <div class="inp-row">
           <span class="inp-lbl">풍력 이용률</span>
-          <input class="inp-field" type="number" id="in-wcf" value="25" min="10" max="45" step="0.5" onchange="recalcDash()">
+          <input class="inp-field" type="number" id="in-wcf" value="20" min="10" max="45" step="0.5" onchange="recalcDash()">
           <span class="inp-unit">%</span>
         </div>
       </div>
@@ -368,23 +410,30 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
     <p>슬라이더를 드래그하여 조절하면 결과가 실시간으로 업데이트됩니다. 기준값은 대시보드의 🎯 버튼으로 설정할 수 있습니다.</p>
   </div>
 
+  <!-- MODE TOGGLE -->
+  <div class="mode-wrap">
+    <span class="mode-label">발전설비 시뮬레이션 모드:</span>
+    <button id="mode-gt-btn" class="mode-btn active-gt" onclick="setSensMode('gt')">⚡ 가스터빈 모드</button>
+    <button id="mode-fc-btn" class="mode-btn" onclick="setSensMode('fc')">🔬 연료전지 모드 (0~50MW)</button>
+  </div>
+
   <!-- SLIDERS -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="stitle" style="margin-bottom:0">변수 조절 슬라이더</div>
     <button class="reset-btn" id="rst-btn" onclick="resetSliders()">↺ 기준값으로 초기화</button>
   </div>
   <div class="sl-grid" style="margin-bottom:20px">
-    <!-- S1: GT -->
-    <div class="sl-card a1">
-      <div class="sl-vname">발전설비 용량 (GT 조합)</div>
-      <div class="sl-num" style="color:var(--a1)" id="sv1">140</div>
-      <div class="sl-unit">MW CC</div>
-      <div id="gt-badge1" class="gt-badge">7E.03 1x1</div>
+    <!-- S1: GT 용량 / FC 용량 -->
+    <div class="sl-card a1" id="s1-card">
+      <div class="sl-vname" id="s1-vname">발전설비 용량 (GT 조합)</div>
+      <div class="sl-num" style="color:var(--a1)" id="sv1">309</div>
+      <div class="sl-unit" id="s1-unit">MW CC</div>
+      <div id="gt-badge1" class="gt-badge">7F.04 1x1</div>
       <div style="margin-top:10px">
-        <div class="sl-range"><span>140 MW</span><span>1,280 MW</span></div>
-        <input type="range" class="c1" id="s1" min="0" max="11" step="1" value="0" oninput="onS1(this.value)">
+        <div class="sl-range" id="s1-range"><span id="s1-min">60 MW</span><span id="s1-max">1,282 MW</span></div>
+        <input type="range" class="c1" id="s1" min="0" max="15" step="1" value="6" oninput="onS1(this.value)">
       </div>
-      <div class="sl-base">기준 <b id="sb1">140MW</b></div>
+      <div class="sl-base">기준 <b id="sb1">309MW</b></div>
     </div>
     <!-- S2: 발전 이용률 -->
     <div class="sl-card a2">
@@ -422,13 +471,13 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
     <!-- S5: PPA 단가 -->
     <div class="sl-card a6">
       <div class="sl-vname">PPA 단가 (RE 전력비)</div>
-      <div class="sl-num" style="color:var(--a6)" id="sv5">220</div>
+      <div class="sl-num" style="color:var(--a6)" id="sv5">185</div>
       <div class="sl-unit">원/kWh</div>
       <div style="margin-top:10px">
         <div class="sl-range"><span>50원</span><span>400원</span></div>
-        <input type="range" class="c6" id="s5" min="50" max="400" step="10" value="220" oninput="onSlider(5,this.value)">
+        <input type="range" class="c6" id="s5" min="50" max="400" step="5" value="185" oninput="onSlider(5,this.value)">
       </div>
-      <div class="sl-base">기준 <b id="sb5">220원/kWh</b></div>
+      <div class="sl-base">기준 <b id="sb5">185원/kWh</b></div>
     </div>
   </div>
 
@@ -479,84 +528,102 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
 
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
 <script>
-// ── GT_DATA ──────────────────────────────────────
+// ── GT_DATA (참고자료(발전기) A1:L10 기준) ─────────────────
+// eff_lhv: % 단위, unit_price: 억원/MW (규모지수법 pre-calc)
 const GT = [
-  {label:'7E.03 1x1', cap:140,  eff_lhv:52.0},
-  {label:'7E.03 2x1', cap:280,  eff_lhv:52.0},
-  {label:'7F.04 1x1', cap:300,  eff_lhv:57.0},
-  {label:'7F.05 1x1', cap:358,  eff_lhv:58.5},
-  {label:'7HA.01 1x1',cap:438,  eff_lhv:62.3},
-  {label:'7HA.02 1x1',cap:573,  eff_lhv:63.4},
-  {label:'7F.04 2x1', cap:600,  eff_lhv:57.0},
-  {label:'7HA.03 1x1',cap:640,  eff_lhv:63.9},
-  {label:'7F.05 2x1', cap:716,  eff_lhv:58.5},
-  {label:'7HA.01 2x1',cap:876,  eff_lhv:62.3},
-  {label:'7HA.02 2x1',cap:1146, eff_lhv:63.4},
-  {label:'7HA.03 2x1',cap:1280, eff_lhv:63.9},
+  {label:'SGT-800 1x1',  cap:60,   eff_lhv:56.525, unit_price:32.833},
+  {label:'7E.02 1x1',    cap:120,  eff_lhv:52.4,   unit_price:26.667},
+  {label:'SGT-800 2x1',  cap:120,  eff_lhv:56.525, unit_price:28.641},
+  {label:'7E.03 1x1',    cap:140,  eff_lhv:52.4,   unit_price:25.464},
+  {label:'7E.02 2x1',    cap:240,  eff_lhv:52.9,   unit_price:23.263},
+  {label:'7E.03 2x1',    cap:283,  eff_lhv:52.9,   unit_price:21.979},
+  {label:'7F.04 1x1',    cap:309,  eff_lhv:59.7,   unit_price:17.994},
+  {label:'7F.05 1x1',    cap:379,  eff_lhv:60.2,   unit_price:16.923},
+  {label:'7HA.01 1x1',   cap:438,  eff_lhv:62.3,   unit_price:14.758},
+  {label:'7HA.02 1x1',   cap:573,  eff_lhv:63.4,   unit_price:13.616},
+  {label:'7F.04 2x1',    cap:622,  eff_lhv:60.1,   unit_price:15.595},
+  {label:'7HA.03 1x1',   cap:640,  eff_lhv:63.9,   unit_price:13.172},
+  {label:'7F.05 2x1',    cap:762,  eff_lhv:60.5,   unit_price:14.685},
+  {label:'7HA.01 2x1',   cap:880,  eff_lhv:62.6,   unit_price:12.815},
+  {label:'7HA.02 2x1',   cap:1148, eff_lhv:63.6,   unit_price:11.856},
+  {label:'7HA.03 2x1',   cap:1282, eff_lhv:64.0,   unit_price:11.472},
 ];
+
+// 연료전지 (PAFC) — 입력변수 시트 기준
+const FC = {eff_hhv:0.49742, unit_price:50, om_rate:0.05};
+
 const LHV_HHV = 119.93/141.86;
 const HHV_H2  = 141.86;
 const EKW     = 58.4;
-const OM_GEN  = 0.03;
+const OM_GEN  = 0.035;   // 복합발전 O&M 3.5%
 const OM_ELEC = 0.025;
 const STACK_R = 0.10;
 const STACK_Y = 10;
 const YBUILD  = 3;
-const BASE_CAP_MW = 140;
-const BASE_UNIT   = 26.14;
-function genUnitPrice(cap){ return BASE_UNIT * Math.pow(BASE_CAP_MW/cap, 0.4); }
 
-// ── 입력 파라미터 ──────────────────────────────
+// ── 전역 상태 ─────────────────────────────────
+let G_TYPE = 'gt';   // 대시보드 발전기 구분: 'gt' | 'fc'
+let G_FC_CAP = 10;   // 연료전지 용량 (MW)
+let SENS_MODE = 'gt'; // 민감도 페이지 모드: 'gt' | 'fc'
+
 let P = {
-  ops:15, wacc:0.08, infl:0.02, fx:1200,
-  gtIdx:0, cf:0.50, mix:1.00,
-  ec:0.50, ppa:220, ppar:0.00, solr:1.00,
-  pel:22.68, psol:13.0, scf:0.15, pwind:28.0, wcf:0.25
+  ops:15, wacc:0.08, infl:0.02, fx:1450,
+  gtIdx:6, cf:0.50, mix:1.00,
+  ec:0.50, ppa:185, ppar:0.00, solr:1.00,
+  pel:27.405, psol:15.0, scf:0.15, pwind:60.0, wcf:0.20
 };
 let BASE = {};
-let SV = {1:0, 2:50, 3:100, 4:50, 5:220};
+// SV: {1: gtIdx or fcCap, 2: cf%, 3: mix%, 4: ec%, 5: ppa}
+let SV = {1:6, 2:50, 3:100, 4:50, 5:185};
 
-function getEff(gtIdx){ return GT[gtIdx].eff_lhv/100 * LHV_HHV; }
-function getCap(gtIdx){ return GT[gtIdx].cap; }
+// ── calcAll ───────────────────────────────────
+// type: 'gt'|'fc', fcCap: MW (FC 모드일 때 사용)
+function calcAll(gtIdx, cf, mix, ec, ppa, ppar, ops, wacc, infl, pel, psol, scf, solr, pwind, wcf, fx, type, fcCap) {
+  type  = type  || 'gt';
+  fcCap = (fcCap !== undefined) ? fcCap : 10;
 
-// ── 핵심 계산 ─────────────────────────────────
-// LCOE 분모: h2_mix (수소혼소 발전량 기준) → 혼소율 감소 시 LCOE 증가
-function calcAll(gtIdx, cf, mix, ec, ppa, ppar, ops, wacc, infl, pel, psol, scf, solr, pwind, wcf, fx) {
-  const cap     = getCap(gtIdx);
-  const eff_hhv = getEff(gtIdx);
-  const gen_twh = cap * cf * 8760 / 1e6;                 // 총 발전량 TWh/년
-  const h2_mix  = gen_twh * mix;                          // 수소혼소 발전량 TWh/년
-  const h2_ton  = h2_mix * 1e9 * 3600 / (eff_hhv * HHV_H2*1e6) / 1e4;
-  const h2_kg_h = h2_ton*1e4*1e3 / (ec*8760);
-  const elec_mw = h2_kg_h / (1000/EKW);
+  const isFC      = (type === 'fc');
+  const cap       = isFC ? fcCap : GT[gtIdx].cap;
+  const eff_hhv   = isFC ? FC.eff_hhv : (GT[gtIdx].eff_lhv / 100 * LHV_HHV);
+  const cx_unit   = isFC ? FC.unit_price : GT[gtIdx].unit_price;
+  const om_gen_r  = isFC ? FC.om_rate : OM_GEN;
 
-  // 재생E 설비 용량 (PPA 방식 참고)
+  if (cap <= 0 || cf <= 0) {
+    return {gen:0,h2_mix:0,h2:0,elec_mw:0,sol_mw:0,wind_mw:0,
+            cx_gen:0,cx_elec:0,cx_sol_ref:0,cx_wind_ref:0,cx_re_ref:0,cx_tot:0,
+            lcoh:0,lcoe:0,lcoe_capex:0,lcoe_capex_gen:0,lcoe_capex_elec:0,lcoe_om:0,lcoe_ppa:0,yr_data:[]};
+  }
+
+  const gen_twh = cap * cf * 8760 / 1e6;
+  const h2_mix  = gen_twh * mix;
+  const h2_ton  = h2_mix > 0 ? h2_mix * 1e9 * 3600 / (eff_hhv * HHV_H2 * 1e6) / 1e4 : 0;
+  const h2_kg_h = h2_ton * 1e4 * 1e3 / (ec * 8760);
+  const elec_mw = h2_kg_h / (1000 / EKW);
+
   const total_elec_mwh = elec_mw * ec * 8760;
-  const sol_mw  = solr > 0   ? total_elec_mwh * solr    / (scf * 8760) : 0;
-  const wind_mw = solr < 1   ? total_elec_mwh * (1-solr)/ (wcf * 8760) : 0;
+  const sol_mw  = (solr > 0 && scf > 0)   ? total_elec_mwh * solr     / (scf  * 8760) : 0;
+  const wind_mw = (solr < 1 && wcf > 0)   ? total_elec_mwh * (1-solr) / (wcf  * 8760) : 0;
 
-  // CAPEX
-  const cx_gen      = cap * genUnitPrice(cap);
+  const cx_gen      = cap * cx_unit;
   const cx_elec     = elec_mw * pel;
   const cx_tot      = cx_gen + cx_elec;
   const cx_sol_ref  = sol_mw  * psol;
   const cx_wind_ref = wind_mw * pwind;
   const cx_re_ref   = cx_sol_ref + cx_wind_ref;
 
-  // O&M
-  const bom_gen  = cx_gen  * OM_GEN;
-  const bom_elec = cx_elec * OM_ELEC;
+  const bom_gen   = cx_gen  * om_gen_r;
+  const bom_elec  = cx_elec * OM_ELEC;
   const ann_cap      = cx_tot  / YBUILD;
   const ann_cap_gen  = cx_gen  / YBUILD;
   const ann_cap_elec = cx_elec / YBUILD;
 
-  // NPV 계산
   let npv_h2=0, npv_gen=0, npv_capex=0, npv_capex_gen=0, npv_capex_elec=0;
   let npv_om=0, npv_ppa_cost=0, npv_tot=0;
   const yr_data = [];
-  for(let yr=1; yr<=YBUILD+ops; yr++){
-    const df = 1/Math.pow(1+wacc,yr);
-    if(yr <= YBUILD){
+
+  for (let yr=1; yr<=YBUILD+ops; yr++) {
+    const df = 1 / Math.pow(1+wacc, yr);
+    if (yr <= YBUILD) {
       npv_capex      += ann_cap      * df;
       npv_capex_gen  += ann_cap_gen  * df;
       npv_capex_elec += ann_cap_elec * df;
@@ -567,24 +634,29 @@ function calcAll(gtIdx, cf, mix, ec, ppa, ppar, ops, wacc, infl, pel, psol, scf,
       const ppa_inf = Math.pow(1+ppar, op-1);
       const om_g    = bom_gen  * inf;
       const om_e    = bom_elec * inf;
-      const stk     = (op===STACK_Y) ? cx_elec*STACK_R : 0;
-      const ppa_c   = ppa * ppa_inf * elec_mw*ec*8760*1e3 / 1e8;
+      const stk     = (op === STACK_Y) ? cx_elec * STACK_R : 0;
+      const ppa_c   = ppa * ppa_inf * elec_mw * ec * 8760 * 1e3 / 1e8;
       const om_tot  = om_g + om_e + stk + ppa_c;
-      npv_om       += (om_g+om_e+stk)*df;
-      npv_ppa_cost += ppa_c*df;
-      npv_h2       += h2_ton*df;
-      npv_gen      += h2_mix*df;  // 수소혼소 발전량 기준
-      npv_tot      += om_tot*df;
+      npv_om       += (om_g + om_e + stk) * df;
+      npv_ppa_cost += ppa_c * df;
+      npv_h2       += h2_ton * df;
+      npv_gen      += h2_mix * df;  // 수소혼소 발전량 기준
+      npv_tot      += om_tot * df;
       yr_data.push({op, om_g:Math.round(om_g), om_e:Math.round(om_e), stk:Math.round(stk), ppa:Math.round(ppa_c), tot:Math.round(om_tot)});
     }
   }
-  const lcoh = npv_h2>0 ? ((npv_capex*(cx_elec/cx_tot)+npv_om*(cx_elec/(cx_gen+cx_elec))+npv_ppa_cost)*1e8)/(npv_h2*1e4*1e3) : 0;
-  const lcoe              = npv_gen>0 ? (npv_tot*1e8)/(npv_gen*1e9) : 0;
-  const lcoe_capex_gen    = npv_gen>0 ? (npv_capex_gen*1e8)/(npv_gen*1e9) : 0;
-  const lcoe_capex_elec   = npv_gen>0 ? (npv_capex_elec*1e8)/(npv_gen*1e9) : 0;
+
+  const elec_share = cx_tot > 0 ? cx_elec / cx_tot : 0;
+  const lcoh = npv_h2 > 0
+    ? ((npv_capex * elec_share + npv_om * elec_share + npv_ppa_cost) * 1e8) / (npv_h2 * 1e4 * 1e3)
+    : 0;
+  const lcoe              = npv_gen > 0 ? (npv_tot * 1e8) / (npv_gen * 1e9) : 0;
+  const lcoe_capex_gen    = npv_gen > 0 ? (npv_capex_gen  * 1e8) / (npv_gen * 1e9) : 0;
+  const lcoe_capex_elec   = npv_gen > 0 ? (npv_capex_elec * 1e8) / (npv_gen * 1e9) : 0;
   const lcoe_capex        = lcoe_capex_gen + lcoe_capex_elec;
-  const lcoe_om           = npv_gen>0 ? (npv_om*1e8)/(npv_gen*1e9) : 0;
-  const lcoe_ppa          = npv_gen>0 ? (npv_ppa_cost*1e8)/(npv_gen*1e9) : 0;
+  const lcoe_om           = npv_gen > 0 ? (npv_om         * 1e8) / (npv_gen * 1e9) : 0;
+  const lcoe_ppa          = npv_gen > 0 ? (npv_ppa_cost   * 1e8) / (npv_gen * 1e9) : 0;
+
   return {gen:gen_twh, h2_mix, h2:h2_ton, elec_mw, sol_mw, wind_mw,
           cx_gen, cx_elec, cx_sol_ref, cx_wind_ref, cx_re_ref, cx_tot,
           lcoh, lcoe, lcoe_capex, lcoe_capex_gen, lcoe_capex_elec, lcoe_om, lcoe_ppa, yr_data};
@@ -593,56 +665,65 @@ function calcAll(gtIdx, cf, mix, ec, ppa, ppar, ops, wacc, infl, pel, psol, scf,
 // ── 차트 인스턴스 ──────────────────────────────
 let chCapex, chCost, chWf, chRadar, chDonut, chSweep;
 
-// ── 초기화 ────────────────────────────────────
-function initAll(){
-  updateP();
-  const r = calcFull();
-  setBaseFromResult(r);
-  updateKPI(r);
-  updateAutoFields();
-  initChartsDash(r);
-  buildTrendTable(r);
-  SV = {1:0, 2:P.cf*100, 3:P.mix*100, 4:P.ec*100, 5:P.ppa};
-  initChartsSens(r);
-  runSens();
+// ── calcFull (대시보드용) ─────────────────────
+function calcFull() {
+  return calcAll(P.gtIdx, P.cf, P.mix, P.ec, P.ppa, P.ppar, P.ops, P.wacc, P.infl,
+                 P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, G_TYPE, G_FC_CAP);
 }
 
-function calcFull(){
-  return calcAll(P.gtIdx,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx);
-}
-
-function updateP(){
+// ── updateP ───────────────────────────────────
+function updateP() {
   P.ops  = +document.getElementById('in-ops').value;
-  P.wacc = +document.getElementById('in-wacc').value/100;
-  P.infl = +document.getElementById('in-infl').value/100;
+  P.wacc = +document.getElementById('in-wacc').value / 100;
+  P.infl = +document.getElementById('in-infl').value / 100;
   P.fx   = +document.getElementById('in-fx').value;
   P.gtIdx= +document.getElementById('in-gt').value;
-  P.cf   = +document.getElementById('in-cf').value/100;
-  P.mix  = +document.getElementById('in-mix').value/100;
-  P.ec   = +document.getElementById('in-ec').value/100;
+  P.cf   = +document.getElementById('in-cf').value / 100;
+  P.mix  = +document.getElementById('in-mix').value / 100;
+  P.ec   = +document.getElementById('in-ec').value / 100;
   P.ppa  = +document.getElementById('in-ppa').value;
-  P.ppar = +document.getElementById('in-ppar').value/100;
-  P.solr = +document.getElementById('in-solr').value/100;
+  P.ppar = +document.getElementById('in-ppar').value / 100;
+  P.solr = +document.getElementById('in-solr').value / 100;
   P.pel  = +document.getElementById('in-pel').value;
   P.psol = +document.getElementById('in-psol').value;
-  P.scf  = +document.getElementById('in-scf').value/100;
+  P.scf  = +document.getElementById('in-scf').value / 100;
   P.pwind= +document.getElementById('in-pwind').value;
-  P.wcf  = +document.getElementById('in-wcf').value/100;
+  P.wcf  = +document.getElementById('in-wcf').value / 100;
+  G_FC_CAP = +document.getElementById('in-fccap').value;
 }
 
-function onGTChange(){
+// ── 발전기 구분 변경 ──────────────────────────
+function onGenTypeChange() {
+  G_TYPE = document.getElementById('in-gentype').value;
+  const isFC = (G_TYPE === 'fc');
+  document.getElementById('rows-gt').style.display = isFC ? 'none' : '';
+  document.getElementById('rows-fc').style.display = isFC ? ''     : 'none';
+  updateAutoFields();
+  recalcDash();
+}
+
+function onGTChange() {
   P.gtIdx = +document.getElementById('in-gt').value;
   updateAutoFields();
   recalcDash();
 }
 
-function updateAutoFields(){
-  const gt = GT[P.gtIdx];
-  document.getElementById('disp-eff').textContent = (gt.eff_lhv * LHV_HHV).toFixed(2)+'%';
-  document.getElementById('disp-pgn').textContent = genUnitPrice(gt.cap).toFixed(2);
+function updateAutoFields() {
+  const isFC = (G_TYPE === 'fc');
+  if (isFC) {
+    document.getElementById('disp-eff').textContent = (FC.eff_hhv * 100).toFixed(3) + '%';
+    document.getElementById('lbl-eff').textContent  = 'FC 효율 (HHV) ▷';
+    document.getElementById('disp-pgn').textContent = FC.unit_price.toFixed(3);
+  } else {
+    const gt = GT[P.gtIdx];
+    document.getElementById('disp-eff').textContent = (gt.eff_lhv * LHV_HHV).toFixed(3) + '%';
+    document.getElementById('lbl-eff').textContent  = 'CC 효율 (HHV) ▷';
+    document.getElementById('disp-pgn').textContent = gt.unit_price.toFixed(3);
+  }
 }
 
-function recalcDash(){
+// ── 대시보드 재계산 ───────────────────────────
+function recalcDash() {
   updateP();
   const r = calcFull();
   updateKPI(r);
@@ -650,45 +731,75 @@ function recalcDash(){
   buildTrendTable(r);
 }
 
-function setBaseFromResult(r){
+// ── BASE 저장 (P 파라미터 전체 포함) ──────────
+function setBaseFromResult(r) {
   BASE = {
     gen:r.gen, h2_mix:r.h2_mix, h2:r.h2, elec_mw:r.elec_mw, sol_mw:r.sol_mw, wind_mw:r.wind_mw,
     cx_gen:r.cx_gen, cx_elec:r.cx_elec, cx_re_ref:r.cx_re_ref, cx_tot:r.cx_tot,
     lcoh:r.lcoh, lcoe:r.lcoe,
-    gtIdx:P.gtIdx, cf:P.cf, mix:P.mix, ec:P.ec, ppa:P.ppa
+    gtIdx:P.gtIdx, cf:P.cf, mix:P.mix, ec:P.ec, ppa:P.ppa,
+    // P 파라미터 전체 저장 (민감도 기준값 연동용)
+    ppar:P.ppar, ops:P.ops, wacc:P.wacc, infl:P.infl,
+    pel:P.pel, psol:P.psol, scf:P.scf, solr:P.solr, pwind:P.pwind, wcf:P.wcf, fx:P.fx,
+    // 발전기 모드
+    type:G_TYPE, fcCap:G_FC_CAP
   };
 }
 
-function setBaseline(){
+// ── 🎯 민감도 기준값 설정 ─────────────────────
+function setBaseline() {
   updateP();
   const r = calcFull();
   setBaseFromResult(r);
-  SV = {1:P.gtIdx, 2:P.cf*100, 3:P.mix*100, 4:P.ec*100, 5:P.ppa};
-  document.getElementById('sb1').textContent = GT[P.gtIdx].cap+'MW';
+  SV = {1: G_TYPE==='fc' ? G_FC_CAP : P.gtIdx,
+        2: Math.round(P.cf*100),
+        3: Math.round(P.mix*100),
+        4: Math.round(P.ec*100),
+        5: P.ppa};
+
+  // 슬라이더 UI 업데이트
+  const s1 = document.getElementById('s1');
+  if (G_TYPE === 'fc') {
+    document.getElementById('sb1').textContent = G_FC_CAP + 'MW';
+    s1.value = G_FC_CAP;
+    updateTrack(s1, 'c1', G_FC_CAP, 0, 50);
+    document.getElementById('sv1').textContent = G_FC_CAP;
+    document.getElementById('gt-badge1').textContent = 'PAFC';
+  } else {
+    document.getElementById('sb1').textContent = GT[P.gtIdx].cap + 'MW';
+    s1.value = P.gtIdx;
+    updateTrack(s1, 'c1', P.gtIdx, 0, GT.length-1);
+    document.getElementById('sv1').textContent = GT[P.gtIdx].cap;
+    document.getElementById('gt-badge1').textContent = GT[P.gtIdx].label;
+  }
+  const s2=document.getElementById('s2'); s2.value=Math.round(P.cf*100);
   document.getElementById('sb2').textContent = Math.round(P.cf*100)+'%';
+  document.getElementById('sv2').textContent = Math.round(P.cf*100);
+  updateTrack(s2,'c2',P.cf*100,0,100);
+
+  const s3=document.getElementById('s3'); s3.value=Math.round(P.mix*100);
   document.getElementById('sb3').textContent = Math.round(P.mix*100)+'%';
+  document.getElementById('sv3').textContent = Math.round(P.mix*100);
+  updateTrack(s3,'c3',P.mix*100,20,100);
+
+  const s4=document.getElementById('s4'); s4.value=Math.round(P.ec*100);
   document.getElementById('sb4').textContent = Math.round(P.ec*100)+'%';
+  document.getElementById('sv4').textContent = Math.round(P.ec*100);
+  updateTrack(s4,'c5',P.ec*100,0,100);
+
+  const s5=document.getElementById('s5'); s5.value=P.ppa;
   document.getElementById('sb5').textContent = P.ppa+'원/kWh';
-  const s1=document.getElementById('s1'); s1.value=P.gtIdx; updateTrack(s1,'c1',P.gtIdx,0,11);
-  const s2=document.getElementById('s2'); s2.value=Math.round(P.cf*100); updateTrack(s2,'c2',P.cf*100,0,100);
-  const s3=document.getElementById('s3'); s3.value=Math.round(P.mix*100); updateTrack(s3,'c3',P.mix*100,20,100);
-  const s4=document.getElementById('s4'); s4.value=Math.round(P.ec*100); updateTrack(s4,'c5',P.ec*100,0,100);
-  const s5=document.getElementById('s5'); s5.value=P.ppa; updateTrack(s5,'c6',P.ppa,50,400);
-  document.getElementById('sv1').textContent=GT[P.gtIdx].cap;
-  document.getElementById('gt-badge1').textContent=GT[P.gtIdx].label;
-  document.getElementById('sv2').textContent=Math.round(P.cf*100);
-  document.getElementById('sv3').textContent=Math.round(P.mix*100);
-  document.getElementById('sv4').textContent=Math.round(P.ec*100);
-  document.getElementById('sv5').textContent=P.ppa;
+  document.getElementById('sv5').textContent = P.ppa;
+  updateTrack(s5,'c6',P.ppa,50,400);
+
   runSens();
-  const btn=document.querySelector('.link-btn');
-  const orig=btn.innerHTML; btn.innerHTML='✅ 기준값 설정 완료';
-  setTimeout(()=>btn.innerHTML=orig, 1500);
+  const btn = document.querySelector('.link-btn');
+  const orig = btn.innerHTML; btn.innerHTML = '✅ 기준값 설정 완료';
+  setTimeout(() => btn.innerHTML = orig, 1500);
 }
 
 // ── KPI 업데이트 ────────────────────────────────
-function updateKPI(r){
-  const gt = GT[P.gtIdx];
+function updateKPI(r) {
   document.getElementById('kv-gen').textContent  = r.h2_mix.toFixed(4)+' TWh/년';
   document.getElementById('ks-gen').textContent  = '총발전 '+r.gen.toFixed(3)+' TWh × 혼소율 '+Math.round(P.mix*100)+'%';
   document.getElementById('kv-h2').textContent   = r.h2.toFixed(4)+' 만톤/년';
@@ -704,17 +815,13 @@ function updateKPI(r){
 }
 
 // ── 대시보드 차트 ──────────────────────────────
-function initChartsDash(r){
-  // 도넛 (발전+수전해+재생E, 투자비 datalabels)
-  chCapex = new Chart(document.getElementById('ch-capex'),{
+function initChartsDash(r) {
+  chCapex = new Chart(document.getElementById('ch-capex'), {
     type:'doughnut',
     data:{
       labels:['발전설비','수전해설비','재생E설비(참고)'],
-      datasets:[{
-        data:[r.cx_gen,r.cx_elec,r.cx_re_ref],
-        backgroundColor:['#00c2ff','#00e5a0','#ff9f43'],
-        borderColor:'#1a2940',borderWidth:3
-      }]
+      datasets:[{data:[r.cx_gen,r.cx_elec,r.cx_re_ref],
+        backgroundColor:['#00c2ff','#00e5a0','#ff9f43'],borderColor:'#1a2940',borderWidth:3}]
     },
     options:{
       responsive:true,maintainAspectRatio:false,cutout:'58%',
@@ -722,12 +829,9 @@ function initChartsDash(r){
         legend:{position:'right',labels:{color:'#b0c4de',font:{size:11},padding:12}},
         tooltip:{callbacks:{label:c=>{
           const tot=c.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
-          return ` ${c.label}: ${Math.round(c.parsed).toLocaleString()}억 (${(c.parsed/tot*100).toFixed(1)}%)`;
+          return ` ${c.label}: ${Math.round(c.parsed).toLocaleString()}억 (${tot?( c.parsed/tot*100).toFixed(1):0}%)`;
         }}},
-        datalabels:{
-          color:'rgba(255,255,255,0.9)',
-          font:{size:9,weight:'bold'},
-          anchor:'center',align:'center',
+        datalabels:{color:'rgba(255,255,255,0.9)',font:{size:9,weight:'bold'},anchor:'center',align:'center',
           formatter:(v,ctx)=>{
             const tot=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
             if(!tot||v/tot<0.05) return '';
@@ -738,21 +842,16 @@ function initChartsDash(r){
     }
   });
 
-  // LCOE 비용 분해 (발전CAPEX+수전해CAPEX+O&M+PPA, 금액 datalabels)
-  chCost = new Chart(document.getElementById('ch-cost'),{
+  chCost = new Chart(document.getElementById('ch-cost'), {
     type:'bar',
     data:buildCostData(r),
     options:{
       responsive:true,maintainAspectRatio:false,indexAxis:'y',
       plugins:{
         legend:{labels:{color:'#b0c4de',font:{size:10}}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.x.toFixed(1)} 원/kWh (${(c.parsed.x/r.lcoe*100).toFixed(1)}%)`}},
-        datalabels:{
-          color:'rgba(255,255,255,0.85)',
-          font:{size:9,weight:'bold'},
-          anchor:'center',align:'center',
-          formatter:(v)=> v < 1.5 ? '' : v.toFixed(1)
-        }
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.x.toFixed(1)} 원/kWh (${r.lcoe?(c.parsed.x/r.lcoe*100).toFixed(1):0}%)`}},
+        datalabels:{color:'rgba(255,255,255,0.85)',font:{size:9,weight:'bold'},anchor:'center',align:'center',
+          formatter:(v)=> v < 1.5 ? '' : v.toFixed(1)}
       },
       scales:{
         x:{stacked:true,ticks:{color:'#b0c4de',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'},
@@ -763,49 +862,47 @@ function initChartsDash(r){
   });
 }
 
-function buildCostData(r){
+function buildCostData(r) {
   return {
     labels:['LCOE 구성'],
     datasets:[
-      {label:'발전설비 CAPEX',  data:[r.lcoe_capex_gen],  backgroundColor:'rgba(0,194,255,.82)',borderRadius:4},
-      {label:'수전해설비 CAPEX',data:[r.lcoe_capex_elec], backgroundColor:'rgba(72,219,251,.68)',borderRadius:4},
-      {label:'O&M (운영·유지)',  data:[r.lcoe_om],         backgroundColor:'rgba(162,155,254,.75)',borderRadius:4},
-      {label:'RE PPA 전력비',   data:[r.lcoe_ppa],        backgroundColor:'rgba(255,159,67,.80)',borderRadius:4},
+      {label:'발전설비 CAPEX',   data:[r.lcoe_capex_gen],  backgroundColor:'rgba(0,194,255,.82)',borderRadius:4},
+      {label:'수전해설비 CAPEX', data:[r.lcoe_capex_elec], backgroundColor:'rgba(72,219,251,.68)',borderRadius:4},
+      {label:'O&M (운영·유지)',   data:[r.lcoe_om],         backgroundColor:'rgba(162,155,254,.75)',borderRadius:4},
+      {label:'RE PPA 전력비',    data:[r.lcoe_ppa],        backgroundColor:'rgba(255,159,67,.80)',borderRadius:4},
     ]
   };
 }
 
-function updateChartsDash(r){
-  chCapex.data.datasets[0].data=[r.cx_gen,r.cx_elec,r.cx_re_ref];
+function updateChartsDash(r) {
+  chCapex.data.datasets[0].data = [r.cx_gen, r.cx_elec, r.cx_re_ref];
   chCapex.update();
-  const cd=buildCostData(r);
-  cd.datasets.forEach((ds,i)=>chCost.data.datasets[i].data=ds.data);
-  chCost.options.plugins.tooltip.callbacks.label=c=>` ${c.dataset.label}: ${c.parsed.x.toFixed(1)} 원/kWh (${(c.parsed.x/r.lcoe*100).toFixed(1)}%)`;
+  const cd = buildCostData(r);
+  cd.datasets.forEach((ds,i) => chCost.data.datasets[i].data = ds.data);
+  chCost.options.plugins.tooltip.callbacks.label = c => ` ${c.dataset.label}: ${c.parsed.x.toFixed(1)} 원/kWh (${r.lcoe?(c.parsed.x/r.lcoe*100).toFixed(1):0}%)`;
   chCost.update();
 }
 
 // ── 추이 테이블 ────────────────────────────────
-function buildTrendTable(r){
-  let h=`<thead><tr><th>연도</th><th>수전해 O&M (억)</th><th>발전 O&M (억)</th><th>RE PPA비 (억)</th><th>스택교체 (억)</th><th>총 OPEX (억)</th></tr></thead><tbody>`;
-  r.yr_data.forEach(d=>{
-    h+=`<tr class="${d.stk>0?'hi':''}"><td>Year ${d.op+YBUILD}${d.stk>0?' 🔧':''}</td>
+function buildTrendTable(r) {
+  let h = `<thead><tr><th>연도</th><th>수전해 O&M (억)</th><th>발전 O&M (억)</th><th>RE PPA비 (억)</th><th>스택교체 (억)</th><th>총 OPEX (억)</th></tr></thead><tbody>`;
+  r.yr_data.forEach(d => {
+    h += `<tr class="${d.stk>0?'hi':''}"><td>Year ${d.op+YBUILD}${d.stk>0?' 🔧':''}</td>
       <td>${d.om_e.toLocaleString()}</td><td>${d.om_g.toLocaleString()}</td>
       <td>${d.ppa.toLocaleString()}</td><td>${d.stk>0?d.stk.toLocaleString():'-'}</td>
       <td><b>${d.tot.toLocaleString()}</b></td></tr>`;
   });
-  document.getElementById('ttbl').innerHTML=h+'</tbody>';
+  document.getElementById('ttbl').innerHTML = h + '</tbody>';
 }
 
 // ── 민감도 차트 초기화 ─────────────────────────
-function initChartsSens(r){
-  // 워터폴
-  chWf = new Chart(document.getElementById('sc-wf'),{
+function initChartsSens(r) {
+  chWf = new Chart(document.getElementById('sc-wf'), {
     type:'bar', data:buildWF(),
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
-        legend:{display:false},
-        datalabels:{display:false},
+        legend:{display:false},datalabels:{display:false},
         tooltip:{callbacks:{
           title:c=>c[0].label.replace('\n',' '),
           label:c=>{
@@ -824,23 +921,20 @@ function initChartsSens(r){
       }
     }
   });
-  // 레이더
-  chRadar = new Chart(document.getElementById('sc-radar'),{
+
+  chRadar = new Chart(document.getElementById('sc-radar'), {
     type:'radar', data:buildRadar(r),
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{labels:{color:'#b0c4de',font:{size:10}}},
-        datalabels:{display:false}
-      },
+      plugins:{legend:{labels:{color:'#b0c4de',font:{size:10}}},datalabels:{display:false}},
       scales:{r:{beginAtZero:true,suggestedMax:200,
         ticks:{color:'#b0c4de',font:{size:8},backdropColor:'transparent',stepSize:50,callback:v=>v+'%'},
         grid:{color:'rgba(255,255,255,.08)'},angleLines:{color:'rgba(255,255,255,.08)'},
         pointLabels:{color:'#b0c4de',font:{size:10}}}}
     }
   });
-  // 도넛 (재생E 추가)
-  chDonut = new Chart(document.getElementById('sc-donut'),{
+
+  chDonut = new Chart(document.getElementById('sc-donut'), {
     type:'doughnut',
     data:{
       labels:['발전설비','수전해설비','재생E설비(참고)'],
@@ -850,9 +944,7 @@ function initChartsSens(r){
       responsive:true,maintainAspectRatio:false,cutout:'58%',
       plugins:{
         legend:{position:'right',labels:{color:'#b0c4de',font:{size:10},padding:8}},
-        datalabels:{
-          color:'rgba(255,255,255,0.9)',font:{size:9,weight:'bold'},
-          anchor:'center',align:'center',
+        datalabels:{color:'rgba(255,255,255,0.9)',font:{size:9,weight:'bold'},anchor:'center',align:'center',
           formatter:(v,ctx)=>{
             const tot=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
             if(!tot||v/tot<0.05) return '';
@@ -862,15 +954,12 @@ function initChartsSens(r){
       }
     }
   });
-  // 스윕 라인
-  chSweep = new Chart(document.getElementById('sc-sweep'),{
+
+  chSweep = new Chart(document.getElementById('sc-sweep'), {
     type:'line', data:buildSweepData(),
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{labels:{color:'#b0c4de',font:{size:10}}},
-        datalabels:{display:false}
-      },
+      plugins:{legend:{labels:{color:'#b0c4de',font:{size:10}}},datalabels:{display:false}},
       scales:{
         x:{type:'linear',min:0,max:6,ticks:{color:'#b0c4de',font:{size:9}},
           grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'범위 내 위치 (최솟값→최댓값)',color:'#b0c4de',font:{size:9}}},
@@ -881,22 +970,64 @@ function initChartsSens(r){
   });
 }
 
-// ── 워터폴 (5단계: GT→이용률→혼소율→수전해→PPA) ──
-function buildWF(){
-  const gi=SV[1], cf=SV[2]/100, mix=SV[3]/100, ec=SV[4]/100, ppa_v=SV[5];
+// ── 민감도용 calcAll 헬퍼 ─────────────────────
+// BASE에 저장된 P파라미터를 기준으로 계산 (기준값 고정용)
+function lcBase(gtIdx_or_fc, cf, mix, ec, ppa) {
   const b = BASE;
-  const bgi=b.gtIdx||0, bcf=b.cf||0.5, bmix=b.mix||1, bec=b.ec||0.5, bppa=b.ppa||220;
-  function lc(gi2,cf2,mix2,ec2,ppa2){
-    return calcAll(gi2,cf2,mix2,ec2,ppa2,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx).lcoe;
+  const bType  = b.type  || 'gt';
+  const bFcCap = b.fcCap || 10;
+  const bOps   = b.ops   || P.ops;
+  const bWacc  = b.wacc  || P.wacc;
+  const bInfl  = b.infl  || P.infl;
+  const bPel   = b.pel   || P.pel;
+  const bPsol  = b.psol  || P.psol;
+  const bScf   = b.scf   || P.scf;
+  const bSolr  = b.solr  || P.solr;
+  const bPwind = b.pwind || P.pwind;
+  const bWcf   = b.wcf   || P.wcf;
+  const bFx    = b.fx    || P.fx;
+  const bPpar  = (b.ppar !== undefined) ? b.ppar : P.ppar;
+  // BASE가 FC 모드였으면 FC cap으로, GT 모드였으면 gtIdx로
+  const useFcCap = (bType === 'fc') ? bFcCap : undefined;
+  const useGtIdx = (bType === 'fc') ? 0 : gtIdx_or_fc;
+  return calcAll(useGtIdx, cf, mix, ec, ppa, bPpar, bOps, bWacc, bInfl,
+                 bPel, bPsol, bScf, bSolr, bPwind, bWcf, bFx, bType, useFcCap).lcoe;
+}
+
+// 현재 민감도 모드로 계산
+function lcSens(arg1, cf, mix, ec, ppa) {
+  if (SENS_MODE === 'fc') {
+    return calcAll(0, cf, mix, ec, ppa, P.ppar, P.ops, P.wacc, P.infl,
+                   P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'fc', arg1).lcoe;
+  } else {
+    return calcAll(arg1, cf, mix, ec, ppa, P.ppar, P.ops, P.wacc, P.infl,
+                   P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'gt').lcoe;
   }
-  const l0=lc(bgi,bcf,bmix,bec,bppa);
-  const l1=lc(gi, bcf,bmix,bec,bppa);
-  const l2=lc(gi, cf, bmix,bec,bppa);
-  const l3=lc(gi, cf, mix, bec,bppa);
-  const l4=lc(gi, cf, mix, ec, bppa);
-  const l5=lc(gi, cf, mix, ec, ppa_v);
-  const d=[l1-l0,l2-l1,l3-l2,l4-l3,l5-l4];
-  const fd=[
+}
+
+// ── 워터폴 ────────────────────────────────────
+function buildWF() {
+  const gi   = SV[1];
+  const cf   = SV[2]/100, mix=SV[3]/100, ec=SV[4]/100, ppa_v=SV[5];
+  const b    = BASE;
+  // 기준값 (BASE에 저장된 슬라이더 값)
+  const bgi  = (b.type==='fc') ? (b.fcCap||10) : (b.gtIdx||6);
+  const bcf  = b.cf  || 0.5;
+  const bmix = b.mix || 1.0;
+  const bec  = b.ec  || 0.5;
+  const bppa = b.ppa || 185;
+
+  // 기준 LCOE는 BASE P 파라미터로 계산
+  const l0 = lcBase(bgi, bcf, bmix, bec, bppa);
+  // 각 변수를 순차 변경 — 현재 P 파라미터 사용
+  const l1 = lcSens(gi,  bcf, bmix, bec, bppa);
+  const l2 = lcSens(gi,  cf,  bmix, bec, bppa);
+  const l3 = lcSens(gi,  cf,  mix,  bec, bppa);
+  const l4 = lcSens(gi,  cf,  mix,  ec,  bppa);
+  const l5 = lcSens(gi,  cf,  mix,  ec,  ppa_v);
+
+  const d = [l1-l0, l2-l1, l3-l2, l4-l3, l5-l4];
+  const fd = [
     [0,l0],
     d[0]>=0?[l0,l1]:[l1,l0],
     d[1]>=0?[l1,l2]:[l2,l1],
@@ -909,21 +1040,31 @@ function buildWF(){
     if(Math.abs(dv)<0.5) return 'rgba(176,196,222,.5)';
     return dv>0?'rgba(255,107,107,.85)':'rgba(0,229,160,.85)';
   }
-  const finClr=l5<l0?'rgba(0,229,160,.85)':l5>l0?'rgba(255,107,107,.85)':'rgba(0,194,255,.85)';
-  const colors=['rgba(162,155,254,.85)',clrFor(d[0]),clrFor(d[1]),clrFor(d[2]),clrFor(d[3]),clrFor(d[4]),finClr];
-  const labels=['기준 LCOE',`GT조합\n(${GT[gi].label})`,`발전이용률\n(${SV[2]}%)`,`혼소율\n(${SV[3]}%)`,`수전해이용률\n(${SV[4]}%)`,`PPA단가\n(${ppa_v}원)`,`최종 LCOE`];
-  return {labels,datasets:[{
-    label:'LCOE',data:fd,
+  const finClr = l5<l0?'rgba(0,229,160,.85)':l5>l0?'rgba(255,107,107,.85)':'rgba(0,194,255,.85)';
+  const colors = ['rgba(162,155,254,.85)',clrFor(d[0]),clrFor(d[1]),clrFor(d[2]),clrFor(d[3]),clrFor(d[4]),finClr];
+
+  // S1 레이블: GT 모드 vs FC 모드
+  let s1lbl;
+  if (SENS_MODE === 'fc') {
+    s1lbl = `FC용량\n(${gi}MW)`;
+  } else {
+    s1lbl = `GT조합\n(${GT[gi]?GT[gi].label:'—'})`;
+  }
+  const labels = ['기준 LCOE', s1lbl, `발전이용률\n(${SV[2]}%)`, `혼소율\n(${SV[3]}%)`,
+                  `수전해이용률\n(${SV[4]}%)`, `PPA단가\n(${ppa_v}원)`, '최종 LCOE'];
+
+  return {labels, datasets:[{
+    label:'LCOE', data:fd,
     backgroundColor:colors,
     borderColor:colors.map(c=>c.replace(/[\d.]+\)$/,'1)')),
-    borderWidth:1,borderRadius:4,barPercentage:0.55
+    borderWidth:1, borderRadius:4, barPercentage:0.55
   }]};
 }
 
 // ── 레이더 ────────────────────────────────────
-function buildRadar(r){
-  const b=BASE;
-  const cur=[
+function buildRadar(r) {
+  const b = BASE;
+  const cur = [
     b.h2_mix?r.h2_mix/b.h2_mix*100:100, b.h2?r.h2/b.h2*100:100,
     b.elec_mw?r.elec_mw/b.elec_mw*100:100, b.cx_tot?r.cx_tot/b.cx_tot*100:100,
     b.lcoh?r.lcoh/b.lcoh*100:100, b.lcoe?r.lcoe/b.lcoe*100:100
@@ -938,105 +1079,207 @@ function buildRadar(r){
 }
 
 // ── 스윕 데이터 ─────────────────────────────────
-function buildSweepData(){
-  const sw1=GT.map((_,i)=>calcAll(i,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx).lcoe);
-  const cfs=[40,50,60,70,80,90,100];
-  const sw2=cfs.map(v=>calcAll(P.gtIdx,v/100,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx).lcoe);
-  const ecs=[20,30,40,50,60,70,80,90,100];
-  const sw3=ecs.map(v=>calcAll(P.gtIdx,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx).lcoe);
-  return {datasets:[
-    {label:'GT 용량 변화',data:sw1.map((v,i)=>({x:i*(6/(GT.length-1)),y:v})),borderColor:'#00c2ff',tension:.4,pointRadius:3,fill:false},
-    {label:'발전 이용률 변화',data:sw2.map((v,i)=>({x:i*(6/(cfs.length-1)),y:v})),borderColor:'#00e5a0',tension:.4,pointRadius:3,fill:false},
-    {label:'수전해 이용률 변화',data:sw3.map((v,i)=>({x:i*(6/(ecs.length-1)),y:v})),borderColor:'#ff9f43',tension:.4,pointRadius:3,fill:false},
-  ]};
+function buildSweepData() {
+  if (SENS_MODE === 'fc') {
+    // FC 모드: FC 용량 / 발전이용률 / 수전해이용률 스윕
+    const fcCaps = [5,10,15,20,25,30,35,40,45,50];
+    const sw1 = fcCaps.map(v => calcAll(0,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'fc',v).lcoe);
+    const cfs = [10,20,30,40,50,60,70,80,90,100];
+    const sw2 = cfs.map(v => calcAll(0,v/100,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'fc',SV[1]||10).lcoe);
+    const ecs = [20,30,40,50,60,70,80,90,100];
+    const sw3 = ecs.map(v => calcAll(0,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'fc',SV[1]||10).lcoe);
+    return {datasets:[
+      {label:'FC 용량 변화',    data:sw1.map((v,i)=>({x:i*(6/(sw1.length-1)),y:v})),borderColor:'#00e5a0',tension:.4,pointRadius:3,fill:false},
+      {label:'발전 이용률 변화',data:sw2.map((v,i)=>({x:i*(6/(sw2.length-1)),y:v})),borderColor:'#a29bfe',tension:.4,pointRadius:3,fill:false},
+      {label:'수전해 이용률 변화',data:sw3.map((v,i)=>({x:i*(6/(sw3.length-1)),y:v})),borderColor:'#ff9f43',tension:.4,pointRadius:3,fill:false},
+    ]};
+  } else {
+    // GT 모드: GT 용량 / 발전이용률 / 수전해이용률 스윕
+    const sw1 = GT.map((_,i) => calcAll(i,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'gt').lcoe);
+    const cfs = [40,50,60,70,80,90,100];
+    const sw2 = cfs.map(v => calcAll(P.gtIdx,v/100,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'gt').lcoe);
+    const ecs = [20,30,40,50,60,70,80,90,100];
+    const sw3 = ecs.map(v => calcAll(P.gtIdx,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'gt').lcoe);
+    return {datasets:[
+      {label:'GT 용량 변화',    data:sw1.map((v,i)=>({x:i*(6/(GT.length-1)),y:v})),borderColor:'#00c2ff',tension:.4,pointRadius:3,fill:false},
+      {label:'발전 이용률 변화',data:sw2.map((v,i)=>({x:i*(6/(cfs.length-1)),y:v})),borderColor:'#00e5a0',tension:.4,pointRadius:3,fill:false},
+      {label:'수전해 이용률 변화',data:sw3.map((v,i)=>({x:i*(6/(ecs.length-1)),y:v})),borderColor:'#ff9f43',tension:.4,pointRadius:3,fill:false},
+    ]};
+  }
 }
 
 // ── 슬라이더 ────────────────────────────────────
-function updateTrack(el,cls,val,mn,mx){
-  el.style.setProperty('--p',((val-mn)/(mx-mn)*100).toFixed(1)+'%');
+function updateTrack(el, cls, val, mn, mx) {
+  el.style.setProperty('--p', ((val-mn)/(mx-mn)*100).toFixed(1)+'%');
 }
-function onS1(idx){
-  SV[1]=+idx;
-  document.getElementById('sv1').textContent=GT[idx].cap;
-  document.getElementById('gt-badge1').textContent=GT[idx].label;
-  updateTrack(document.getElementById('s1'),'c1',+idx,0,11);
-  runSens();
-}
-function onSlider(id,val){
-  SV[id]=+val;
-  document.getElementById('sv'+id).textContent=val;
-  const cls=['','c1','c2','c3','c5','c6'][id];
-  const ranges=[[],[],[0,100],[20,100],[0,100],[50,400]];
-  const r2=ranges[id]||[0,100];
-  updateTrack(document.getElementById('s'+id),cls,+val,r2[0],r2[1]);
+
+function onS1(idx) {
+  SV[1] = +idx;
+  const s1 = document.getElementById('s1');
+  if (SENS_MODE === 'fc') {
+    document.getElementById('sv1').textContent = idx;
+    document.getElementById('gt-badge1').textContent = 'PAFC · ' + idx + ' MW';
+    updateTrack(s1, 'c1', +idx, 0, 50);
+  } else {
+    const i = +idx;
+    document.getElementById('sv1').textContent = GT[i] ? GT[i].cap : '—';
+    document.getElementById('gt-badge1').textContent = GT[i] ? GT[i].label : '—';
+    updateTrack(s1, 'c1', +idx, 0, GT.length-1);
+  }
   runSens();
 }
 
-function runSens(){
-  const gi=SV[1], cf=SV[2]/100, mix=SV[3]/100, ec=SV[4]/100, ppa_v=SV[5];
-  const r=calcAll(gi,cf,mix,ec,ppa_v,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx);
+function onSlider(id, val) {
+  SV[id] = +val;
+  document.getElementById('sv'+id).textContent = val;
+  const cls   = ['','c1','c2','c3','c5','c6'][id];
+  const ranges = [[],[],[0,100],[20,100],[0,100],[50,400]];
+  const r2 = ranges[id] || [0,100];
+  updateTrack(document.getElementById('s'+id), cls, +val, r2[0], r2[1]);
+  runSens();
+}
+
+// ── 민감도 모드 전환 ─────────────────────────
+function setSensMode(mode) {
+  SENS_MODE = mode;
+  const s1 = document.getElementById('s1');
+  const gtBtn = document.getElementById('mode-gt-btn');
+  const fcBtn = document.getElementById('mode-fc-btn');
+
+  if (mode === 'fc') {
+    // FC 모드
+    gtBtn.className = 'mode-btn';
+    fcBtn.className = 'mode-btn active-fc';
+    document.getElementById('s1-vname').textContent  = '연료전지 용량';
+    document.getElementById('s1-unit').textContent   = 'MW';
+    document.getElementById('s1-min').textContent    = '0 MW';
+    document.getElementById('s1-max').textContent    = '50 MW';
+    s1.min = 0; s1.max = 50; s1.step = 1;
+    // 기본값 10MW
+    const fcDefault = 10;
+    SV[1] = fcDefault;
+    s1.value = fcDefault;
+    document.getElementById('sv1').textContent = fcDefault;
+    document.getElementById('gt-badge1').textContent = 'PAFC · ' + fcDefault + ' MW';
+    updateTrack(s1, 'c1', fcDefault, 0, 50);
+    document.getElementById('sb1').textContent = '10MW';
+  } else {
+    // GT 모드
+    gtBtn.className = 'mode-btn active-gt';
+    fcBtn.className = 'mode-btn';
+    document.getElementById('s1-vname').textContent  = '발전설비 용량 (GT 조합)';
+    document.getElementById('s1-unit').textContent   = 'MW CC';
+    document.getElementById('s1-min').textContent    = GT[0].cap + ' MW';
+    document.getElementById('s1-max').textContent    = GT[GT.length-1].cap.toLocaleString() + ' MW';
+    s1.min = 0; s1.max = GT.length-1; s1.step = 1;
+    // 기준 복원
+    const baseIdx = BASE.gtIdx !== undefined ? BASE.gtIdx : P.gtIdx;
+    SV[1] = baseIdx;
+    s1.value = baseIdx;
+    document.getElementById('sv1').textContent = GT[baseIdx] ? GT[baseIdx].cap : '—';
+    document.getElementById('gt-badge1').textContent = GT[baseIdx] ? GT[baseIdx].label : '—';
+    updateTrack(s1, 'c1', baseIdx, 0, GT.length-1);
+    document.getElementById('sb1').textContent = (GT[baseIdx]?GT[baseIdx].cap:'—') + 'MW';
+  }
+  runSens();
+}
+
+// ── runSens ────────────────────────────────────
+function runSens() {
+  const gi    = SV[1];
+  const cf    = SV[2]/100, mix=SV[3]/100, ec=SV[4]/100, ppa_v=SV[5];
+
+  let r;
+  if (SENS_MODE === 'fc') {
+    r = calcAll(0, cf, mix, ec, ppa_v, P.ppar, P.ops, P.wacc, P.infl,
+                P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'fc', gi);
+  } else {
+    r = calcAll(gi, cf, mix, ec, ppa_v, P.ppar, P.ops, P.wacc, P.infl,
+                P.pel, P.psol, P.scf, P.solr, P.pwind, P.wcf, P.fx, 'gt');
+  }
+
   updateResCards(r);
+
   // 워터폴
-  const wf=buildWF();
-  chWf.data.labels=wf.labels;
-  chWf.data.datasets[0].data=wf.datasets[0].data;
-  chWf.data.datasets[0].backgroundColor=wf.datasets[0].backgroundColor;
-  chWf.data.datasets[0].borderColor=wf.datasets[0].borderColor;
+  const wf = buildWF();
+  chWf.data.labels = wf.labels;
+  chWf.data.datasets[0].data = wf.datasets[0].data;
+  chWf.data.datasets[0].backgroundColor = wf.datasets[0].backgroundColor;
+  chWf.data.datasets[0].borderColor = wf.datasets[0].borderColor;
   chWf.update();
+
   // 레이더
-  chRadar.data.datasets[1].data=buildRadar(r).datasets[1].data;
+  chRadar.data.datasets[1].data = buildRadar(r).datasets[1].data;
   chRadar.update();
+
   // 도넛
-  chDonut.data.datasets[0].data=[r.cx_gen,r.cx_elec,r.cx_re_ref];
+  chDonut.data.datasets[0].data = [r.cx_gen, r.cx_elec, r.cx_re_ref];
   chDonut.update();
+
   // 스윕
-  const sw=buildSweepData();
-  chSweep.data.datasets.forEach((ds,i)=>{ds.data=sw.datasets[i].data;});
+  const sw = buildSweepData();
+  chSweep.data.datasets.forEach((ds,i) => { ds.data = sw.datasets[i] ? sw.datasets[i].data : []; });
+  // 레이블 동기화
+  chSweep.data.datasets.forEach((ds,i) => { if(sw.datasets[i]) ds.label = sw.datasets[i].label; });
   chSweep.update();
 }
 
 // ── 결과 카드 ───────────────────────────────────
-function updateResCards(r){
+function updateResCards(r) {
   const re_total = r.sol_mw + r.wind_mw;
-  const entries=[
-    {i:1, val:r.h2_mix.toFixed(4)+' TWh/년', base:BASE.h2_mix, cur:r.h2_mix},
-    {i:2, val:r.h2.toFixed(4)+' 만톤/년',   base:BASE.h2,     cur:r.h2},
-    {i:3, val:Math.round(r.elec_mw).toLocaleString()+' MW', base:BASE.elec_mw, cur:r.elec_mw},
-    {i:4, val:Math.round(r.sol_mw).toLocaleString()+'MW(태양광) / '+Math.round(r.wind_mw).toLocaleString()+'MW(풍력)', base:(BASE.sol_mw||0)+(BASE.wind_mw||0), cur:re_total},
-    {i:5, val:Math.round(r.cx_gen).toLocaleString()+' 억원',    base:BASE.cx_gen,    cur:r.cx_gen},
-    {i:6, val:Math.round(r.cx_elec).toLocaleString()+' 억원',   base:BASE.cx_elec,   cur:r.cx_elec},
-    {i:7, val:Math.round(r.cx_re_ref).toLocaleString()+' 억원(참고)', base:BASE.cx_re_ref, cur:r.cx_re_ref},
-    {i:8, val:Math.round(r.cx_tot).toLocaleString()+' 억원',    base:BASE.cx_tot,    cur:r.cx_tot},
-    {i:9, val:Math.round(r.lcoh).toLocaleString()+' 원/kg',     base:BASE.lcoh,      cur:r.lcoh},
-    {i:10,val:Math.round(r.lcoe).toLocaleString()+' 원/kWh',    base:BASE.lcoe,      cur:r.lcoe},
+  const entries = [
+    {i:1,  val:r.h2_mix.toFixed(4)+' TWh/년',  base:BASE.h2_mix, cur:r.h2_mix},
+    {i:2,  val:r.h2.toFixed(4)+' 만톤/년',      base:BASE.h2,     cur:r.h2},
+    {i:3,  val:Math.round(r.elec_mw).toLocaleString()+' MW', base:BASE.elec_mw, cur:r.elec_mw},
+    {i:4,  val:Math.round(r.sol_mw).toLocaleString()+'MW(태양광) / '+Math.round(r.wind_mw).toLocaleString()+'MW(풍력)', base:(BASE.sol_mw||0)+(BASE.wind_mw||0), cur:re_total},
+    {i:5,  val:Math.round(r.cx_gen).toLocaleString()+' 억원',      base:BASE.cx_gen,  cur:r.cx_gen},
+    {i:6,  val:Math.round(r.cx_elec).toLocaleString()+' 억원',     base:BASE.cx_elec, cur:r.cx_elec},
+    {i:7,  val:Math.round(r.cx_re_ref).toLocaleString()+' 억원(참고)', base:BASE.cx_re_ref, cur:r.cx_re_ref},
+    {i:8,  val:Math.round(r.cx_tot).toLocaleString()+' 억원',      base:BASE.cx_tot,  cur:r.cx_tot},
+    {i:9,  val:Math.round(r.lcoh).toLocaleString()+' 원/kg',       base:BASE.lcoh,    cur:r.lcoh},
+    {i:10, val:Math.round(r.lcoe).toLocaleString()+' 원/kWh',      base:BASE.lcoe,    cur:r.lcoe},
   ];
-  entries.forEach(e=>{
-    document.getElementById('rv'+e.i).textContent=e.val;
-    const el=document.getElementById('rch'+e.i);
-    const card=document.getElementById('rc'+e.i);
+  entries.forEach(e => {
+    document.getElementById('rv'+e.i).textContent = e.val;
+    const el   = document.getElementById('rch'+e.i);
+    const card = document.getElementById('rc'+e.i);
     card.classList.remove('up','dn');
-    if(!e.base||Math.abs((e.cur-e.base)/e.base)<0.001){
-      el.className='res-chg eq';el.textContent='= 기준값';
+    if (!e.base || Math.abs((e.cur-e.base)/e.base) < 0.001) {
+      el.className = 'res-chg eq'; el.textContent = '= 기준값';
     } else {
-      const pct=((e.cur-e.base)/e.base*100);
-      if(pct>0){el.className='res-chg up';el.textContent=`▲ +${pct.toFixed(1)}%`;card.classList.add('up');}
-      else{el.className='res-chg dn';el.textContent=`▼ ${pct.toFixed(1)}%`;card.classList.add('dn');}
+      const pct = (e.cur-e.base)/e.base*100;
+      if (pct>0) { el.className='res-chg up'; el.textContent=`▲ +${pct.toFixed(1)}%`; card.classList.add('up'); }
+      else       { el.className='res-chg dn'; el.textContent=`▼ ${pct.toFixed(1)}%`;  card.classList.add('dn'); }
     }
   });
 }
 
 // ── 초기화 버튼 ─────────────────────────────────
-function resetSliders(){
-  const bgi =BASE.gtIdx||0;
-  const bcf =Math.round((BASE.cf||0.5)*100);
-  const bmix=Math.round((BASE.mix||1)*100);
-  const bec =Math.round((BASE.ec||0.5)*100);
-  const bppa=BASE.ppa||220;
-  SV={1:bgi,2:bcf,3:bmix,4:bec,5:bppa};
-  const s1=document.getElementById('s1'); s1.value=bgi;
-  document.getElementById('sv1').textContent=GT[bgi].cap;
-  document.getElementById('gt-badge1').textContent=GT[bgi].label;
-  updateTrack(s1,'c1',bgi,0,11);
+function resetSliders() {
+  const bType = BASE.type || 'gt';
+  const bIdx  = BASE.gtIdx !== undefined ? BASE.gtIdx : P.gtIdx;
+  const bFcCap= BASE.fcCap || 10;
+  const bcf   = Math.round((BASE.cf  || P.cf)*100);
+  const bmix  = Math.round((BASE.mix || P.mix)*100);
+  const bec   = Math.round((BASE.ec  || P.ec)*100);
+  const bppa  = BASE.ppa || P.ppa;
+
+  if (SENS_MODE === 'fc') {
+    SV = {1:bFcCap, 2:bcf, 3:bmix, 4:bec, 5:bppa};
+    const s1 = document.getElementById('s1');
+    s1.value = bFcCap;
+    document.getElementById('sv1').textContent = bFcCap;
+    document.getElementById('gt-badge1').textContent = 'PAFC · '+bFcCap+' MW';
+    updateTrack(s1,'c1',bFcCap,0,50);
+  } else {
+    SV = {1:bIdx, 2:bcf, 3:bmix, 4:bec, 5:bppa};
+    const s1 = document.getElementById('s1');
+    s1.value = bIdx;
+    document.getElementById('sv1').textContent = GT[bIdx]?GT[bIdx].cap:'—';
+    document.getElementById('gt-badge1').textContent = GT[bIdx]?GT[bIdx].label:'—';
+    updateTrack(s1,'c1',bIdx,0,GT.length-1);
+  }
+
   const s2=document.getElementById('s2'); s2.value=bcf;
   document.getElementById('sv2').textContent=bcf; updateTrack(s2,'c2',bcf,0,100);
   const s3=document.getElementById('s3'); s3.value=bmix;
@@ -1045,73 +1288,109 @@ function resetSliders(){
   document.getElementById('sv4').textContent=bec; updateTrack(s4,'c5',bec,0,100);
   const s5=document.getElementById('s5'); s5.value=bppa;
   document.getElementById('sv5').textContent=bppa; updateTrack(s5,'c6',bppa,50,400);
+
   runSens();
-  const btn=document.getElementById('rst-btn');
-  btn.innerHTML='✓ 초기화 완료';btn.style.color='var(--a2)';btn.style.borderColor='var(--a2)';
-  setTimeout(()=>{btn.innerHTML='↺ 기준값으로 초기화';btn.style.color='';btn.style.borderColor='';},1200);
+  const btn = document.getElementById('rst-btn');
+  btn.innerHTML='✓ 초기화 완료'; btn.style.color='var(--a2)'; btn.style.borderColor='var(--a2)';
+  setTimeout(()=>{ btn.innerHTML='↺ 기준값으로 초기화'; btn.style.color=''; btn.style.borderColor=''; }, 1200);
 }
 
 // ── 민감도 테이블 ────────────────────────────────
-function buildSensTable(){
-  const tbl=document.getElementById('mt');
-  const metrics=[
+function buildSensTable() {
+  const tbl = document.getElementById('mt');
+  const metrics = [
     {k:'h2_mix', lbl:'수소발전량 (TWh/년)', fmt:v=>v.toFixed(4)},
-    {k:'h2',     lbl:'수소소모량 (만톤/년)',fmt:v=>v.toFixed(4)},
-    {k:'elec_mw',lbl:'수전해 용량 (MW)',   fmt:v=>Math.round(v).toLocaleString()},
-    {k:'cx_gen', lbl:'발전 CAPEX (억원)',  fmt:v=>Math.round(v).toLocaleString()},
-    {k:'cx_elec',lbl:'수전해 CAPEX (억원)',fmt:v=>Math.round(v).toLocaleString()},
-    {k:'cx_tot', lbl:'총 CAPEX (억원)',    fmt:v=>Math.round(v).toLocaleString()},
-    {k:'lcoh',   lbl:'LCOH (원/kg)',       fmt:v=>Math.round(v).toLocaleString()},
-    {k:'lcoe',   lbl:'LCOE (원/kWh)',      fmt:v=>Math.round(v).toLocaleString()},
+    {k:'h2',     lbl:'수소소모량 (만톤/년)', fmt:v=>v.toFixed(4)},
+    {k:'elec_mw',lbl:'수전해 용량 (MW)',    fmt:v=>Math.round(v).toLocaleString()},
+    {k:'cx_gen', lbl:'발전 CAPEX (억원)',   fmt:v=>Math.round(v).toLocaleString()},
+    {k:'cx_elec',lbl:'수전해 CAPEX (억원)', fmt:v=>Math.round(v).toLocaleString()},
+    {k:'cx_tot', lbl:'총 CAPEX (억원)',     fmt:v=>Math.round(v).toLocaleString()},
+    {k:'lcoh',   lbl:'LCOH (원/kg)',        fmt:v=>Math.round(v).toLocaleString()},
+    {k:'lcoe',   lbl:'LCOE (원/kWh)',       fmt:v=>Math.round(v).toLocaleString()},
   ];
-  const groups=[
-    {lbl:'발전설비 용량 (GT 조합)',accent:'#00c2ff',
-      vals:GT.map((_,i)=>i),labels:GT.map(g=>g.cap+'MW'),baseIdx:0,
-      calc:v=>calcAll(v,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx)},
-    {lbl:'발전 이용률 (%)',accent:'#00e5a0',
-      vals:[40,50,60,70,80,90,100],labels:['40%','50%','60%','70%','80%','90%','100%'],baseIdx:1,
-      calc:v=>calcAll(P.gtIdx,v/100,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx)},
-    {lbl:'수전해 이용률 (%)',accent:'#ff9f43',
-      vals:[20,30,40,50,60,70,80,90,100],labels:['20%','30%','40%','50%','60%','70%','80%','90%','100%'],baseIdx:3,
-      calc:v=>calcAll(P.gtIdx,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx)},
-  ];
-  let html='';
-  groups.forEach((g,gi)=>{
-    const results=g.vals.map(v=>g.calc(v));
-    const baseR=results[g.baseIdx];
-    html+=`<thead><tr><th class="vc" style="color:${g.accent}">▌ ${g.lbl}</th>${g.labels.map((l,i)=>`<th style="${i===g.baseIdx?`color:${g.accent}`:''}">${l}</th>`).join('')}</tr></thead><tbody>`;
-    metrics.forEach(m=>{
-      html+=`<tr><td class="vn">${m.lbl}</td>${results.map((r,i)=>{
+
+  let groups;
+  if (SENS_MODE === 'fc') {
+    groups = [
+      {lbl:'연료전지 용량 (MW)',accent:'#00e5a0',
+        vals:[5,10,15,20,25,30,40,50],labels:['5MW','10MW','15MW','20MW','25MW','30MW','40MW','50MW'],baseIdx:1,
+        calc:v=>calcAll(0,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'fc',v)},
+      {lbl:'발전 이용률 (%)',accent:'#00c2ff',
+        vals:[20,30,40,50,60,70,80],labels:['20%','30%','40%','50%','60%','70%','80%'],baseIdx:3,
+        calc:v=>calcAll(0,v/100,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'fc',SV[1]||10)},
+      {lbl:'수전해 이용률 (%)',accent:'#ff9f43',
+        vals:[20,30,40,50,60,70,80,90,100],labels:['20%','30%','40%','50%','60%','70%','80%','90%','100%'],baseIdx:3,
+        calc:v=>calcAll(0,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'fc',SV[1]||10)},
+    ];
+  } else {
+    groups = [
+      {lbl:'발전설비 용량 (GT 조합)',accent:'#00c2ff',
+        vals:GT.map((_,i)=>i),labels:GT.map(g=>g.cap+'MW'),baseIdx:6,
+        calc:v=>calcAll(v,P.cf,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'gt')},
+      {lbl:'발전 이용률 (%)',accent:'#00e5a0',
+        vals:[40,50,60,70,80,90,100],labels:['40%','50%','60%','70%','80%','90%','100%'],baseIdx:1,
+        calc:v=>calcAll(P.gtIdx,v/100,P.mix,P.ec,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'gt')},
+      {lbl:'수전해 이용률 (%)',accent:'#ff9f43',
+        vals:[20,30,40,50,60,70,80,90,100],labels:['20%','30%','40%','50%','60%','70%','80%','90%','100%'],baseIdx:3,
+        calc:v=>calcAll(P.gtIdx,P.cf,P.mix,v/100,P.ppa,P.ppar,P.ops,P.wacc,P.infl,P.pel,P.psol,P.scf,P.solr,P.pwind,P.wcf,P.fx,'gt')},
+    ];
+  }
+
+  let html = '';
+  groups.forEach((g,gi) => {
+    const results = g.vals.map(v => g.calc(v));
+    const baseR   = results[g.baseIdx];
+    html += `<thead><tr><th class="vc" style="color:${g.accent}">▌ ${g.lbl}</th>${g.labels.map((l,i)=>`<th style="${i===g.baseIdx?`color:${g.accent}`:''}">${l}</th>`).join('')}</tr></thead><tbody>`;
+    metrics.forEach(m => {
+      html += `<tr><td class="vn">${m.lbl}</td>${results.map((r,i)=>{
         const v=r[m.k]; const base=baseR[m.k];
         const p=base?((v-base)/base*100):0;
-        const isB=i===g.baseIdx;
+        const isB=(i===g.baseIdx);
         const clr=p>0.5?'#ff6b6b':p<-0.5?'#00e5a0':'#b0c4de';
         return `<td style="${isB?`font-weight:700;color:${g.accent};background:rgba(0,0,0,.2)`:''}" title="Δ ${p>=0?'+':''}${p.toFixed(1)}%">
           ${m.fmt(v)}<br><small style="color:${isB?g.accent:clr};font-size:9px">${isB?'기준':(p>=0?'▲+':'▼')+Math.abs(p).toFixed(1)+'%'}</small></td>`;
       }).join('')}</tr>`;
     });
-    html+=`</tbody>`;
-    if(gi<groups.length-1) html+=`<thead><tr><td colspan="${g.vals.length+1}" style="height:12px;background:transparent;border:none"></td></tr></thead>`;
+    html += '</tbody>';
+    if (gi < groups.length-1) html += `<thead><tr><td colspan="${g.vals.length+1}" style="height:12px;background:transparent;border:none"></td></tr></thead>`;
   });
-  tbl.innerHTML=html;
+  tbl.innerHTML = html;
 }
 
 // ── 페이지 전환 ─────────────────────────────────
-function showPage(id,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='sens'){ buildSensTable(); }
+  if (id === 'sens') {
+    buildSensTable();
+    runSens();  // ← 버그 수정: 대시보드 변경사항 즉시 반영
+  }
+}
+
+// ── 초기화 ────────────────────────────────────
+function initAll() {
+  updateP();
+  updateAutoFields();
+  const r = calcFull();
+  setBaseFromResult(r);
+  updateKPI(r);
+  initChartsDash(r);
+  buildTrendTable(r);
+  SV = {1:P.gtIdx, 2:Math.round(P.cf*100), 3:Math.round(P.mix*100), 4:Math.round(P.ec*100), 5:P.ppa};
+  initChartsSens(r);
+  runSens();
 }
 
 // ── INIT ─────────────────────────────────────────
-window.onload=()=>{
-  updateTrack(document.getElementById('s1'),'c1',0,0,11);
-  updateTrack(document.getElementById('s2'),'c2',50,0,100);
-  updateTrack(document.getElementById('s3'),'c3',100,20,100);
-  updateTrack(document.getElementById('s4'),'c5',50,0,100);
-  updateTrack(document.getElementById('s5'),'c6',220,50,400);
+window.onload = () => {
+  // 초기 슬라이더 트랙 설정
+  updateTrack(document.getElementById('s1'), 'c1', 6,   0,   GT.length-1);
+  updateTrack(document.getElementById('s2'), 'c2', 50,  0,   100);
+  updateTrack(document.getElementById('s3'), 'c3', 100, 20,  100);
+  updateTrack(document.getElementById('s4'), 'c5', 50,  0,   100);
+  updateTrack(document.getElementById('s5'), 'c6', 185, 50,  400);
   initAll();
 };
 </script>
