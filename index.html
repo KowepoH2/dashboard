@@ -262,6 +262,7 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
           <select class="inp-select" id="in-gentype" onchange="onGenTypeChange()">
             <option value="gt">복합발전</option>
             <option value="fc">연료전지</option>
+            <option value="manual">수동입력</option>
           </select>
           <span class="inp-unit"></span>
         </div>
@@ -301,6 +302,30 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
             <span class="fc-badge">PAFC · η 49.74% · 50억/MW · O&amp;M 5%</span>
           </div>
         </div>
+
+        <!-- 수동입력 모드 행들 -->
+        <div id="rows-manual" style="display:none">
+          <div class="inp-row">
+            <span class="inp-lbl">설비용량</span>
+            <input class="inp-field" type="number" id="in-mcap" value="309" min="1" max="5000" step="1" onchange="onManualChange()">
+            <span class="inp-unit">MW</span>
+          </div>
+          <div class="inp-row">
+            <span class="inp-lbl">효율 (LHV 기준)</span>
+            <input class="inp-field" type="number" id="in-meff" value="59.7" min="10" max="90" step="0.1" onchange="onManualChange()">
+            <span class="inp-unit">%</span>
+          </div>
+          <div class="inp-row">
+            <span class="inp-lbl">투자비 (CAPEX)</span>
+            <input class="inp-field" type="number" id="in-mprice" value="17.994" min="1" max="200" step="0.1" onchange="onManualChange()">
+            <span class="inp-unit">억/MW</span>
+          </div>
+          <div class="inp-row">
+            <span class="inp-lbl">O&amp;M율</span>
+            <input class="inp-field" type="number" id="in-mom" value="3.5" min="0" max="20" step="0.1" onchange="onManualChange()">
+            <span class="inp-unit">%/년</span>
+          </div>
+        </div>
         <!-- 공통 행들 -->
         <div class="inp-row">
           <span class="inp-lbl">발전 이용률</span>
@@ -313,7 +338,7 @@ input[type=range].c6::-webkit-slider-runnable-track{height:4px;border-radius:2px
           <span class="inp-unit">%</span>
         </div>
         <div class="inp-row">
-          <span class="inp-lbl" id="lbl-eff">CC 효율 (HHV) ▷</span>
+          <span class="inp-lbl" id="lbl-eff">CC 효율 (LHV) ▷</span>
           <div class="inp-auto" id="disp-eff">—</div>
           <span class="inp-unit">자동</span>
         </div>
@@ -552,7 +577,7 @@ const GT = [
 // 연료전지 (PAFC) — 입력변수 시트 기준
 const FC = {eff_hhv:0.49742, unit_price:50, om_rate:0.05};
 
-const LHV_HHV = 119.93/141.86;
+const LHV_HHV = 1/1.19;  // 엑셀 기준: HHV효율 = LHV효율 / 1.19
 const HHV_H2  = 141.86;
 const EKW     = 58.4;
 const OM_GEN  = 0.035;   // 복합발전 O&M 3.5%
@@ -562,8 +587,9 @@ const STACK_Y = 10;
 const YBUILD  = 3;
 
 // ── 전역 상태 ─────────────────────────────────
-let G_TYPE = 'gt';   // 대시보드 발전기 구분: 'gt' | 'fc'
+let G_TYPE = 'gt';   // 대시보드 발전기 구분: 'gt' | 'fc' | 'manual'
 let G_FC_CAP = 10;   // 연료전지 용량 (MW)
+let G_MANUAL = {cap:309, eff_lhv:59.7, unit_price:17.994, om_rate:0.035};
 let SENS_MODE = 'gt'; // 민감도 페이지 모드: 'gt' | 'fc'
 
 let P = {
@@ -583,10 +609,13 @@ function calcAll(gtIdx, cf, mix, ec, ppa, ppar, ops, wacc, infl, pel, psol, scf,
   fcCap = (fcCap !== undefined) ? fcCap : 10;
 
   const isFC      = (type === 'fc');
-  const cap       = isFC ? fcCap : GT[gtIdx].cap;
-  const eff_hhv   = isFC ? FC.eff_hhv : (GT[gtIdx].eff_lhv / 100 * LHV_HHV);
-  const cx_unit   = isFC ? FC.unit_price : GT[gtIdx].unit_price;
-  const om_gen_r  = isFC ? FC.om_rate : OM_GEN;
+  const isManual  = (type === 'manual');
+  const cap       = isFC ? fcCap : (isManual ? G_MANUAL.cap : GT[gtIdx].cap);
+  const eff_hhv   = isFC ? FC.eff_hhv
+                  : (isManual ? G_MANUAL.eff_lhv / 100 * LHV_HHV
+                  : GT[gtIdx].eff_lhv / 100 * LHV_HHV);
+  const cx_unit   = isFC ? FC.unit_price : (isManual ? G_MANUAL.unit_price : GT[gtIdx].unit_price);
+  const om_gen_r  = isFC ? FC.om_rate : (isManual ? G_MANUAL.om_rate : OM_GEN);
 
   if (cap <= 0 || cf <= 0) {
     return {gen:0,h2_mix:0,h2:0,elec_mw:0,sol_mw:0,wind_mw:0,
@@ -690,14 +719,26 @@ function updateP() {
   P.pwind= +document.getElementById('in-pwind').value;
   P.wcf  = +document.getElementById('in-wcf').value / 100;
   G_FC_CAP = +document.getElementById('in-fccap').value;
+  G_MANUAL.cap        = +document.getElementById('in-mcap').value;
+  G_MANUAL.eff_lhv    = +document.getElementById('in-meff').value;
+  G_MANUAL.unit_price = +document.getElementById('in-mprice').value;
+  G_MANUAL.om_rate    = +document.getElementById('in-mom').value / 100;
 }
 
 // ── 발전기 구분 변경 ──────────────────────────
 function onGenTypeChange() {
   G_TYPE = document.getElementById('in-gentype').value;
-  const isFC = (G_TYPE === 'fc');
-  document.getElementById('rows-gt').style.display = isFC ? 'none' : '';
-  document.getElementById('rows-fc').style.display = isFC ? ''     : 'none';
+  const isFC     = (G_TYPE === 'fc');
+  const isManual = (G_TYPE === 'manual');
+  document.getElementById('rows-gt').style.display     = (!isFC && !isManual) ? '' : 'none';
+  document.getElementById('rows-fc').style.display     = isFC     ? '' : 'none';
+  document.getElementById('rows-manual').style.display = isManual ? '' : 'none';
+  updateAutoFields();
+  recalcDash();
+}
+
+function onManualChange() {
+  updateP();
   updateAutoFields();
   recalcDash();
 }
@@ -709,15 +750,22 @@ function onGTChange() {
 }
 
 function updateAutoFields() {
-  const isFC = (G_TYPE === 'fc');
+  const isFC     = (G_TYPE === 'fc');
+  const isManual = (G_TYPE === 'manual');
   if (isFC) {
     document.getElementById('disp-eff').textContent = (FC.eff_hhv * 100).toFixed(3) + '%';
     document.getElementById('lbl-eff').textContent  = 'FC 효율 (HHV) ▷';
     document.getElementById('disp-pgn').textContent = FC.unit_price.toFixed(3);
+  } else if (isManual) {
+    const meff = +document.getElementById('in-meff').value || G_MANUAL.eff_lhv;
+    document.getElementById('disp-eff').textContent = (meff * LHV_HHV).toFixed(3) + '% (HHV)';
+    document.getElementById('lbl-eff').textContent  = 'HHV 변환값 ▷';
+    const mprice = +document.getElementById('in-mprice').value || G_MANUAL.unit_price;
+    document.getElementById('disp-pgn').textContent = mprice.toFixed(3);
   } else {
     const gt = GT[P.gtIdx];
-    document.getElementById('disp-eff').textContent = (gt.eff_lhv * LHV_HHV).toFixed(3) + '%';
-    document.getElementById('lbl-eff').textContent  = 'CC 효율 (HHV) ▷';
+    document.getElementById('disp-eff').textContent = gt.eff_lhv.toFixed(3) + '%';
+    document.getElementById('lbl-eff').textContent  = 'CC 효율 (LHV) ▷';
     document.getElementById('disp-pgn').textContent = gt.unit_price.toFixed(3);
   }
 }
@@ -742,7 +790,8 @@ function setBaseFromResult(r) {
     ppar:P.ppar, ops:P.ops, wacc:P.wacc, infl:P.infl,
     pel:P.pel, psol:P.psol, scf:P.scf, solr:P.solr, pwind:P.pwind, wcf:P.wcf, fx:P.fx,
     // 발전기 모드
-    type:G_TYPE, fcCap:G_FC_CAP
+    type:G_TYPE, fcCap:G_FC_CAP,
+    manual:Object.assign({}, G_MANUAL)
   };
 }
 
